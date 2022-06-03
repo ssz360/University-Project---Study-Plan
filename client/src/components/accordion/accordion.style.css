@@ -1,0 +1,34 @@
+.course {
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    border-radius: 7px;
+    border:1px dashed #ccc;
+}
+
+.active, .course:hover {
+    background-color: #ccc;
+  }
+  
+  .description {
+    padding: 7px 18px;
+    margin: 0 5px;
+    background-color: white;
+    display: none;
+    overflow: hidden;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-end-end-radius: 5px;
+    border-end-start-radius: 5px;
+  }
+
+  .course-des {
+    border-top: 1px solid #dfdbdb;
+    margin-top: -1px;
+    font-size: 11px;
+}

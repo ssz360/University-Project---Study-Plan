@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 function Accordion(props) {
 
     const course = props.course;
-    console.log(course);
     function findAncestor(el, cls) {
         if (el.classList.contains(cls)) return el;
         while ((el = el.parentElement) && !el.classList.contains(cls));
@@ -30,7 +29,7 @@ function Accordion(props) {
 
     return (
         <>
-            <div className="accordion p-4">
+            <div data-courseid={course.id} className="accordion p-4">
                 <div onClick={(e) => openCloseController(e)} className='course'>
                     <h1>{course.name}</h1>
                     <div className='course-des'>
@@ -43,23 +42,27 @@ function Accordion(props) {
                     </div>
                 </div>
                 <div className="description">
-                    <span>Incompatible Courses</span>
-                    {course.incompatibleCourses.map((el) => {
-                        return (
-                            <div className='desc-small-text'>
-                                <span>&nbsp;&nbsp;&nbsp;id:</span>
-                                <span>&nbsp;{el.id}&nbsp; | &nbsp;</span>
-                                <span>max enrolled:</span>
-                                <span>&nbsp;{el.maxStudents}&nbsp; | &nbsp;</span>
-                                <span>credit:</span>
-                                <span>&nbsp;{el.credit}</span>
-                            </div>
-                        );
-                    })}
-                    <span>Preparatory Courses</span>
+                    {!course.incompatibleCourses.length && !course.preparatoryCourses.length ? <span>No Incompatible or reparatory Courses</span> : ''}
+                    {course.incompatibleCourses.length ? <span>Incompatible Courses</span> : ''}
+                    {
+                        course.incompatibleCourses.length ?
+                            course.incompatibleCourses.map((el) => {
+                                return (
+                                    <div key={'ac-max-' + el.id} className='desc-small-text'>
+                                        <span>&nbsp;&nbsp;&nbsp;id:</span>
+                                        <span>&nbsp;{el.id}&nbsp; | &nbsp;</span>
+                                        <span>max enrolled:</span>
+                                        <span>&nbsp;{el.maxStudents}&nbsp; | &nbsp;</span>
+                                        <span>credit:</span>
+                                        <span>&nbsp;{el.credit}</span>
+                                    </div>
+                                );
+                            }) : ''
+                    }
+                    {course.preparatoryCourses.length ? <span>Preparatory Courses</span> : ''}
                     {course.preparatoryCourses.map((el) => {
                         return (
-                            <div className='desc-small-text'>
+                            <div key={'ac-el-' + el.id} className='desc-small-text'>
                                 <span>&nbsp;&nbsp;&nbsp;id:</span>
                                 <span>&nbsp;{el.id}&nbsp; | &nbsp;</span>
                                 <span>max enrolled:</span>

@@ -36,8 +36,13 @@ function StudyPlanTable(props) {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {courses.map(course => <StudyPlanTableElement course={course}></StudyPlanTableElement>)}
+                        <tbody className="p-5">
+                            {
+                                courses.length ?
+                                    courses.map(course => <StudyPlanTableElement key={'tbl' + course.id} course={course}></StudyPlanTableElement>)
+                                    :
+                                    <tr ><td colSpan="2">No Courses Are Added Yet</td></tr>
+                            }
                         </tbody>
                     </table>
                 </div>

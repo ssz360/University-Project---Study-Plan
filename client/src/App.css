@@ -20,3 +20,14 @@
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
   filter: alpha(opacity=20);
 }
+
+.highlighted-border {
+  border-color: #b617d3;
+}
+
+.drag-drop-img {
+  height: 60px;
+  position: absolute;
+  top: -65px;
+  right: -70px;
+}

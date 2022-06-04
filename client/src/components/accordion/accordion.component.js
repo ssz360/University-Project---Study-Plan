@@ -2,8 +2,10 @@ import './accordion.style.css';
 import React, { useEffect, useState } from "react";
 
 
-function Accordion() {
+function Accordion(props) {
 
+    const course = props.course;
+    console.log(course);
     function findAncestor(el, cls) {
         if (el.classList.contains(cls)) return el;
         while ((el = el.parentElement) && !el.classList.contains(cls));
@@ -28,13 +30,45 @@ function Accordion() {
 
     return (
         <>
-            <div className="accordion">
+            <div className="accordion p-4">
                 <div onClick={(e) => openCloseController(e)} className='course'>
-                    <h1>Course Title</h1>
-                    <div className='course-des'>Course Description</div>
+                    <h1>{course.name}</h1>
+                    <div className='course-des'>
+                        <span>&nbsp;&nbsp;&nbsp;id:</span>
+                        <span>&nbsp;{course.id}&nbsp; | &nbsp;</span>
+                        <span>max enrolled:</span>
+                        <span>&nbsp;{course.maxStudents}&nbsp; | &nbsp;</span>
+                        <span>credit:</span>
+                        <span>&nbsp;{course.credit}</span>
+                    </div>
                 </div>
                 <div className="description">
-                    <p>Lorem ipsum...</p>
+                    <span>Incompatible Courses</span>
+                    {course.incompatibleCourses.map((el) => {
+                        return (
+                            <div className='desc-small-text'>
+                                <span>&nbsp;&nbsp;&nbsp;id:</span>
+                                <span>&nbsp;{el.id}&nbsp; | &nbsp;</span>
+                                <span>max enrolled:</span>
+                                <span>&nbsp;{el.maxStudents}&nbsp; | &nbsp;</span>
+                                <span>credit:</span>
+                                <span>&nbsp;{el.credit}</span>
+                            </div>
+                        );
+                    })}
+                    <span>Preparatory Courses</span>
+                    {course.preparatoryCourses.map((el) => {
+                        return (
+                            <div className='desc-small-text'>
+                                <span>&nbsp;&nbsp;&nbsp;id:</span>
+                                <span>&nbsp;{el.id}&nbsp; | &nbsp;</span>
+                                <span>max enrolled:</span>
+                                <span>&nbsp;{el.maxStudents}&nbsp; | &nbsp;</span>
+                                <span>credit:</span>
+                                <span>&nbsp;{el.credit}</span>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </>);

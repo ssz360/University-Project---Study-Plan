@@ -1,12 +1,12 @@
 import StudyPlanHeader from "./studyPlanHeader/studyPlanHeader.component";
 import StudyPlanTable from "./studyPlanTable/studyPlanTable.component";
 
-function StudyPlan() {
+function StudyPlan(props) {
     return (
         <>
             <div className="bg-white p-8 rounded-md w-full">
                 <StudyPlanHeader></StudyPlanHeader>
-                <StudyPlanTable></StudyPlanTable>
+                <StudyPlanTable courses={props.courses}></StudyPlanTable>
             </div>
         </>);
 }

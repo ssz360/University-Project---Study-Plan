@@ -69,10 +69,6 @@ function UserPanelPage() {
           setIsDragged(true);
         }).on("cancel", function (el, container, source) {
           setIsDragged(false);
-
-          console.log(allCourses);
-          console.log(studyplanCourses);
-
         });
     }
   };
@@ -93,6 +89,10 @@ function UserPanelPage() {
   const onEditHandler = (mode) => {
     ifOnEditSet = mode;
     setOnEditMode(mode);
+  }
+
+  const onCourseDeleteHandler = (element) => {
+    setStudyplanCourses(studyplanCourses.filter(el => el !== element))
   }
 
   return (
@@ -122,7 +122,7 @@ function UserPanelPage() {
         <div id='right-container' className={getRightContainerClasses()}>
           <div className='text-center'>
 
-            {!isStudyPlanDownloaded ? <Loading></Loading> : isStudyplanCreated ? <StudyPlan onEdit={onEditHandler} courses={studyplanCourses}></StudyPlan> : <BlankStudyPlan onCreate={onCreateStudyplanHandler}></BlankStudyPlan>}
+            {!isStudyPlanDownloaded ? <Loading></Loading> : isStudyplanCreated ? <StudyPlan isEditMode={onEditMode} onDelete={onCourseDeleteHandler} onEdit={onEditHandler} courses={studyplanCourses}></StudyPlan> : <BlankStudyPlan onCreate={onCreateStudyplanHandler}></BlankStudyPlan>}
 
           </div>
         </div>

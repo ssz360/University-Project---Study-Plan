@@ -13,6 +13,8 @@ function Accordion(props) {
 
     function openCloseController(e) {
 
+        if (props.notFoldable) return;
+
         const parent = findAncestor(e.target, 'accordion');
 
         const course = parent.querySelector('.course');
@@ -29,14 +31,14 @@ function Accordion(props) {
 
     return (
         <>
-            <div data-courseid={course.id} className="accordion p-4">
+            <div onClick={(e) => props.onClick && props.onClick(course)} data-courseid={course.id} className="accordion p-4" data-selected={course.isSelected}>
                 <div onClick={(e) => openCloseController(e)} className='course'>
                     <h1>{course.name}</h1>
                     <div className='course-des'>
                         <span>&nbsp;&nbsp;&nbsp;id:</span>
                         <span>&nbsp;{course.id}&nbsp; | &nbsp;</span>
                         <span>max enrolled:</span>
-                        <span>&nbsp;{course.maxStudents}&nbsp; | &nbsp;</span>
+                        <span>&nbsp;{course.maxStudents >= 0 ? course.maxStudents : '--'}&nbsp; | &nbsp;</span>
                         <span>credit:</span>
                         <span>&nbsp;{course.credit}</span>
                     </div>
@@ -52,7 +54,7 @@ function Accordion(props) {
                                         <span>&nbsp;&nbsp;&nbsp;id:</span>
                                         <span>&nbsp;{el.id}&nbsp; | &nbsp;</span>
                                         <span>max enrolled:</span>
-                                        <span>&nbsp;{el.maxStudents}&nbsp; | &nbsp;</span>
+                                        <span>&nbsp;{el.maxStudents > 0 ? el.maxStudents : '--'}&nbsp; | &nbsp;</span>
                                         <span>credit:</span>
                                         <span>&nbsp;{el.credit}</span>
                                     </div>
@@ -66,7 +68,7 @@ function Accordion(props) {
                                 <span>&nbsp;&nbsp;&nbsp;id:</span>
                                 <span>&nbsp;{el.id}&nbsp; | &nbsp;</span>
                                 <span>max enrolled:</span>
-                                <span>&nbsp;{el.maxStudents}&nbsp; | &nbsp;</span>
+                                <span>&nbsp;{el.maxStudents > 0 ? el.maxStudents : '--'}&nbsp; | &nbsp;</span>
                                 <span>credit:</span>
                                 <span>&nbsp;{el.credit}</span>
                             </div>

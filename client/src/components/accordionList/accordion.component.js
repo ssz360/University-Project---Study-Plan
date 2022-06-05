@@ -9,9 +9,9 @@ function AccordionList(props) {
 
         <OverlayScrollbarsComponent
         >
-            <div id='courses-list' style={{height:'78vh'}}>
+            <div id='courses-list' style={{ height: '78vh' }}>
                 {
-                    props.courses.map(el => <Accordion key={'accordion-' + el.id} course={el}></Accordion>)
+                    props.courses.map(el => <Accordion onClick={props.onClick} notFoldable={props.notFoldable} key={'accordion-' + el.id} course={el}></Accordion>)
                 }
             </div>
         </OverlayScrollbarsComponent>

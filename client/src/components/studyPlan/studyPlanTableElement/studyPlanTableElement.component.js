@@ -15,8 +15,10 @@ function StudyPlanTableElement(props) {
     }, [])
 
 
+
     return (
-        <tr className="text-left">
+
+        <tr className="text-left relative">
             <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                 <p className="text-gray-900 whitespace-no-wrap">{course.id}</p>
             </td>
@@ -65,8 +67,10 @@ function StudyPlanTableElement(props) {
                         ''
                 }
             </td>
+            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                <button disabled={!props.isEditMode} onClick={() => props.onDelete(course)} className="disabled:bg-red-300 bg-red-600 px-4 py-2 rounded-md text-white font-semibold tracking-wide cursor-pointer">Delete</button>
+            </td>
         </tr>
-
     );
 }
 

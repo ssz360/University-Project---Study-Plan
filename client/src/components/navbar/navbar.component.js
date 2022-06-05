@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Navbar() {
   return (
     <>
@@ -16,12 +18,17 @@ function Navbar() {
               </div>
             </div>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              <div className="ml-3 relative">
+              {/* <div className="ml-3 relative">
                 <div className="text-white">
                   <span>Hello Amir</span>
                   <button className="bg-gray-600 ml-5 px-2 py-1 rounded-md text-white font-semibold tracking-wide cursor-pointer">Log out</button>
                 </div>
-              </div>
+              </div> */}
+              <Link to={'/login'}>
+                <button className="bg-green-600 px-4 py-2 rounded-md text-white font-semibold tracking-wide cursor-pointer">Login / Register</button>
+
+              </Link>
+
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ function StudyPlan(props) {
         <>
             <div className="bg-white p-8 rounded-md w-full">
                 <StudyPlanHeader onEdit={props.onEdit}></StudyPlanHeader>
-                <StudyPlanTable courses={props.courses}></StudyPlanTable>
+                <StudyPlanTable isEditMode={props.isEditMode} onDelete={props.onDelete} courses={props.courses}></StudyPlanTable>
             </div>
         </>);
 }

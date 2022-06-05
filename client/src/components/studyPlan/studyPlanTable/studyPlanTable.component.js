@@ -34,12 +34,16 @@ function StudyPlanTable(props) {
                                     className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Conditions
                                 </th>
+                                <th
+                                    className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Remove
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="p-5">
                             {
                                 courses.length ?
-                                    courses.map(course => <StudyPlanTableElement key={'tbl' + course.id} course={course}></StudyPlanTableElement>)
+                                    courses.map(course => <StudyPlanTableElement isEditMode={props.isEditMode} onDelete={props.onDelete} key={'tbl' + course.id} course={course}></StudyPlanTableElement>)
                                     :
                                     <tr ><td colSpan="2">No Courses Are Added Yet</td></tr>
                             }

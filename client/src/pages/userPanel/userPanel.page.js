@@ -8,6 +8,7 @@ import StudyPlan from '../../components/studyPlan/studyPlan.component';
 import Dragula from 'react-dragula';
 import Loading from '../../components/loading/loading.component';
 import { useState } from 'react';
+import AccordionList from '../../components/accordionList/accordion.component';
 
 let allCourses = [
   { id: '01OTWOV', name: 'Computer network technologies and services', credit: 6, enrolled: 3, maxStudents: 3, incompatibleCoursesId: ['02GOLOV'], incompatibleCourses: [], preparatoryCoursesId: ['01TXSOV'], preparatoryCourses: [] },
@@ -68,7 +69,7 @@ function UserPanelPage() {
           setIsDragged(true);
         }).on("cancel", function (el, container, source) {
           setIsDragged(false);
-        
+
           console.log(allCourses);
           console.log(studyplanCourses);
 
@@ -100,7 +101,7 @@ function UserPanelPage() {
       <Navbar></Navbar>
 
       <div className="grid grid-cols-3 gap-4 place-content-around m-10 mt-20" ref={dragulaDecorator}>
-        <div id='courses-list' className=" left-container relative bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
+        <div className=" left-container relative bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
           {onEditMode ? <img className='drag-drop-img' src='images/Curved_Arrow.png' alt=''></img> : ''}
 
           {!isCoursesDownloaded ?
@@ -114,7 +115,7 @@ function UserPanelPage() {
             </div>
 
             :
-            allCourses.map(el =><Accordion key={'accordion-' + el.id} course={el}></Accordion>)
+            <AccordionList courses={allCourses}></AccordionList>
           }
 
         </div>

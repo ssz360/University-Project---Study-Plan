@@ -1,12 +1,12 @@
 import './userPanel.css';
-import Navbar from '../components/navbar/navbar.component';
-import Accordion from '../components/accordion/accordion.component';
-import BlankStudyPlan from '../components/blankStudyPlan/blankStudyPlan.component';
-import StudyPlan from '../components/studyPlan/studyPlan.component';
+import Navbar from '../../components/navbar/navbar.component';
+import Accordion from '../../components/accordion/accordion.component';
+import BlankStudyPlan from '../../components/blankStudyPlan/blankStudyPlan.component';
+import StudyPlan from '../../components/studyPlan/studyPlan.component';
 
 
 import Dragula from 'react-dragula';
-import Loading from '../components/loading/loading.component';
+import Loading from '../../components/loading/loading.component';
 import { useState } from 'react';
 
 let allCourses = [

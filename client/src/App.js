@@ -20,9 +20,10 @@ let allCourses = [
 
 allCourses[0].incompatibleCourses.push(allCourses[1]);
 allCourses[0].preparatoryCourses.push(allCourses[2]);
-
+allCourses[2].incompatibleCourses.push(allCourses[1]);
+allCourses[2].preparatoryCourses.push(allCourses[2]);
 /************************************************* */
-
+let ifOnEditSet = false;
 function App() {
 
   const [isStudyplanCreated, setIsStudyplanCreated] = useState(false);
@@ -30,16 +31,17 @@ function App() {
   const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(true);
   const [studyplanCourses, setStudyplanCourses] = useState([]);
   const [onEditMode, setOnEditMode] = useState(false);
-
+  const [isDragged, setIsDragged] = useState(false);
 
   const dragulaDecorator = (componentBackingInstance) => {
+
     if (componentBackingInstance) {
       let options = {
         isContainer: function (el) {
           return false;
         },
         moves: function (el, source, handle, sibling) {
-          if (!onEditMode) return false;
+          if (!ifOnEditSet) return false;
           if (source.id !== 'courses-list')
             return false;
           return true;
@@ -51,7 +53,7 @@ function App() {
         removeOnSpill: true,
         revertOnSpill: true,
       };
-      Dragula([document.querySelector('#courses-list'), document.querySelector('#left-container')], options)
+      Dragula([document.querySelector('#courses-list'), document.querySelector('#right-container')], options)
         .on('shadow', function (el, container, source) {
 
           const tblBody = container.querySelector('tbody');
@@ -62,13 +64,14 @@ function App() {
           setStudyplanCourses([...studyplanCourses, course]);
           const tblBody = container.querySelector('tbody');
           if ([...tblBody.childNodes].find(x => x === el)) tblBody.removeChild(el);
-          container.classList.remove('highlighted-border');
         }).on("drag", function (el, container, source) {
-          const container1 = document.getElementById('left-container');
-          container1.classList.add('highlighted-border');
+          setIsDragged(true);
         }).on("cancel", function (el, container, source) {
-          const container1 = document.getElementById('left-container');
-          container1.classList.remove('highlighted-border');
+          setIsDragged(false);
+        
+          console.log(allCourses);
+          console.log(studyplanCourses);
+
         });
     }
   };
@@ -77,14 +80,17 @@ function App() {
     setIsStudyplanCreated(true);
   }
 
-  const getLeftContainerClasses = () => {
+  const getRightContainerClasses = () => {
     let classes = "col-span-2 grid grid-cols-1 gap-4 text-center border-2 border-gray-200 border-dashed rounded-md";
     if (!isStudyplanCreated)
       classes += " place-content-evenly ";
+    if (isDragged)
+      classes += " highlighted-border ";
     return classes;
   }
 
   const onEditHandler = (mode) => {
+    ifOnEditSet = mode;
     setOnEditMode(mode);
   }
 
@@ -93,8 +99,9 @@ function App() {
 
       <Navbar></Navbar>
 
-      <div className="grid grid-cols-3 gap-4 place-content-around m-10" ref={dragulaDecorator}>
-        <div id='courses-list' className=" bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
+      <div className="grid grid-cols-3 gap-4 place-content-around m-10 mt-20" ref={dragulaDecorator}>
+        <div id='courses-list' className=" left-container relative bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
+          {onEditMode ? <img className='drag-drop-img' src='images/Curved_Arrow.png' alt=''></img> : ''}
 
           {!isCoursesDownloaded ?
 
@@ -107,11 +114,11 @@ function App() {
             </div>
 
             :
-            allCourses.map(el => <Accordion key={'accordion-' + el.id} course={el}></Accordion>)
+            allCourses.map(el =><Accordion key={'accordion-' + el.id} course={el}></Accordion>)
           }
 
         </div>
-        <div id='left-container' className={getLeftContainerClasses()}>
+        <div id='right-container' className={getRightContainerClasses()}>
           <div className='text-center'>
 
             {!isStudyPlanDownloaded ? <Loading></Loading> : isStudyplanCreated ? <StudyPlan onEdit={onEditHandler} courses={studyplanCourses}></StudyPlan> : <BlankStudyPlan onCreate={onCreateStudyplanHandler}></BlankStudyPlan>}

@@ -50,7 +50,7 @@ function StudyPlanTableElement(props) {
                             className="relative inline-block px-3 py-1 font-semibold text-gray-900 leading-tight cursor-pointer">
                             <span aria-hidden
                                 className="absolute inset-0 bg-red-200 opacity-50 rounded-full"></span>
-                            <span className="relative tooltip-span" data-template={course.incompatibleCoursesId.map(el => el + ',')}>Incompatibility</span>
+                            <span className="relative tooltip-span" data-template={course.incompatibleCoursesId.join(', ')}>Incompatibility</span>
                         </span> :
                         ''
                 }
@@ -60,7 +60,7 @@ function StudyPlanTableElement(props) {
                             className="relative inline-block px-3 py-1 font-semibold text-gray-900 leading-tight cursor-pointer">
                             <span aria-hidden
                                 className="absolute inset-0 bg-yellow-200 opacity-50 rounded-full"></span>
-                            <span className="relative tooltip-span" data-template={course.preparatoryCoursesId.map(el => el + ',')}>Preparatory</span>
+                            <span className="relative tooltip-span" data-template={course.preparatoryCoursesId.join(', ')}>Preparatory</span>
                         </span> :
                         ''
                 }

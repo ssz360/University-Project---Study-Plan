@@ -5,6 +5,8 @@ import Loading from '../../components/loading/loading.component';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import AccordionList from '../../components/accordionList/accordion.component';
 import CourseDetails from '../../components/corseDetails/corseDetails.component';
+import { useNavigate } from 'react-router-dom';
+import { isUserLoggedIn } from '../../services/user.services';
 
 let allCourses = [
   { id: '01OTWOV', name: 'Computer network technologies and services', credit: 6, enrolled: 3, maxStudents: 3, incompatibleCoursesId: ['02GOLOV'], incompatibleCourses: [], preparatoryCoursesId: ['01TXSOV'], preparatoryCourses: [] },
@@ -25,6 +27,8 @@ function MainPage() {
   const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(true);
   const [selectedCourse, setSelectedCrouse] = useState();
 
+  let navigate = useNavigate();
+
   const onAccordionClickHandler = (element) => {
     allCourses.forEach(el => { el.isSelected = false });
     element.isSelected = true;
@@ -35,6 +39,12 @@ function MainPage() {
     onAccordionClickHandler(allCourses[0]);
 
   }, []);
+
+  if (isUserLoggedIn()) {
+    navigate('/user-panel');
+    return;
+  }
+
   return (
     <>
 

@@ -1,6 +1,7 @@
 import './accordion.style.css';
 import React, { useEffect, useState } from "react";
-
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 function Accordion(props) {
 
@@ -10,6 +11,18 @@ function Accordion(props) {
         while ((el = el.parentElement) && !el.classList.contains(cls));
         return el;
     }
+
+
+    // useEffect(() => {
+    setTimeout(() => {
+        tippy('.accordion-info', {
+            content(reference) {
+                const content = reference.getAttribute('data-template');
+                return content;
+            }
+        });
+    }, 1000)
+    //  }, [])
 
     function openCloseController(e) {
 
@@ -31,8 +44,9 @@ function Accordion(props) {
 
     return (
         <>
-            <div onClick={(e) => props.onClick && props.onClick(course)} data-courseid={course.id} className="accordion p-4" data-selected={course.isSelected}>
+            <div disabled={course.error?.hasError} onClick={(e) => props.onClick && props.onClick(course)} data-courseid={course.id} className="accordion p-4 relative" data-selected={course.isSelected}>
                 <div onClick={(e) => openCloseController(e)} className='course'>
+                    <div data-template={course.error?.messages.join('\r\n')} className='accordion-info'>!</div>
                     <h1>{course.name}</h1>
                     <div className='course-des'>
                         <span>&nbsp;&nbsp;&nbsp;id:</span>

@@ -43,3 +43,16 @@
           user-select: none; /* Non-prefixed version, currently
                                 supported by Chrome, Edge, Opera and Firefox */
 }
+
+.table-bottom {
+  bottom: -39px;
+  position: absolute;
+  border: 1px solid #e5e7eb;
+  height: 40px;
+  background: white;
+  left: 50%;
+  border-top: initial;
+  transform: translateX(-50%);
+  padding: 10px;
+  width: 550px;
+}

@@ -7,10 +7,14 @@ import StudyPlan from '../../components/studyPlan/studyPlan.component';
 
 import Dragula from 'react-dragula';
 import Loading from '../../components/loading/loading.component';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AccordionList from '../../components/accordionList/accordion.component';
+import { getUserInfo, isUserLoggedIn } from '../../services/user.services';
+import { useNavigate } from "react-router-dom";
+import { getStudyPlan } from '../../services/sutyPlan.service';
 
-let allCourses = [
+
+let fakeCourses = [
   { id: '01OTWOV', name: 'Computer network technologies and services', credit: 6, enrolled: 3, maxStudents: 3, incompatibleCoursesId: ['02GOLOV'], incompatibleCourses: [], preparatoryCoursesId: ['01TXSOV'], preparatoryCourses: [] },
   { id: '02GOLOV', name: 'Computer architectures', credit: 12, enrolled: 3, maxStudents: -1, incompatibleCoursesId: [], incompatibleCourses: [], preparatoryCoursesId: [], preparatoryCourses: [] },
   { id: '01TXSOV', name: 'Web Applications II', credit: 6, enrolled: 3, maxStudents: -1, incompatibleCoursesId: ['01TXSOV'], incompatibleCourses: [], preparatoryCoursesId: ['01TXYOV'], preparatoryCourses: [] },
@@ -19,20 +23,42 @@ let allCourses = [
 
 /*************************************** temp ***************** */
 
-allCourses[0].incompatibleCourses.push(allCourses[1]);
-allCourses[0].preparatoryCourses.push(allCourses[2]);
-allCourses[2].incompatibleCourses.push(allCourses[1]);
-allCourses[2].preparatoryCourses.push(allCourses[2]);
+fakeCourses[0].incompatibleCourses.push(fakeCourses[1]);
+fakeCourses[0].preparatoryCourses.push(fakeCourses[2]);
+fakeCourses[2].incompatibleCourses.push(fakeCourses[1]);
+fakeCourses[2].preparatoryCourses.push(fakeCourses[2]);
 /************************************************* */
 let ifOnEditSet = false;
+let studyPlanCourses = [];
+
 function UserPanelPage() {
 
-  const [isStudyplanCreated, setIsStudyplanCreated] = useState(false);
+  const [isStudyPlanCreated, setIsStudyPlanCreated] = useState(false);
   const [isStudyPlanDownloaded, setIsStudyPlanDownloaded] = useState(true);
   const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(true);
-  const [studyplanCourses, setStudyplanCourses] = useState([]);
+  const [editModeStudyplanCourses, setEditModeStudyplanCourses] = useState([]);
   const [onEditMode, setOnEditMode] = useState(false);
   const [isDragged, setIsDragged] = useState(false);
+  const [allCourses, setAllCourses] = useState(fakeCourses);
+  const [studyPlan, setStudyPlan] = useState();
+
+  let navigate = useNavigate();
+
+  if (!isUserLoggedIn()) {
+    navigate('/');
+  }
+
+  useEffect(() => {
+    const studyPlan = getStudyPlan(getUserInfo());
+    if (studyPlan) {
+      setIsStudyPlanCreated(true);
+      setStudyPlan(studyPlan);
+    }
+    studyPlanCourses = studyPlan.addedCourses;
+    if (studyPlanCourses.length == 0) {
+      onEditHandler('edit');
+    }
+  }, [])
 
   const dragulaDecorator = (componentBackingInstance) => {
 
@@ -42,9 +68,14 @@ function UserPanelPage() {
           return false;
         },
         moves: function (el, source, handle, sibling) {
+          const courseId = el.getAttribute('data-courseid');
+          const course = allCourses.find(x => x.id == courseId);
+
           if (!ifOnEditSet) return false;
           if (source.id !== 'courses-list')
             return false;
+          if (course.error && course.error.hasError) return false;
+
           return true;
         },
         invalid: function (el, handle) {
@@ -60,9 +91,9 @@ function UserPanelPage() {
           const tblBody = container.querySelector('tbody');
           tblBody.appendChild(el);
         }).on("drop", function (el, container, source) {
-          const courseId = el.getAttribute('data-courseid');
-          const course = allCourses.find(x => x.id == courseId);
-          setStudyplanCourses([...studyplanCourses, course]);
+
+          onDropAndAddToStudyPlan(el);
+
           const tblBody = container.querySelector('tbody');
           if ([...tblBody.childNodes].find(x => x === el)) tblBody.removeChild(el);
         }).on("drag", function (el, container, source) {
@@ -74,25 +105,93 @@ function UserPanelPage() {
   };
 
   const onCreateStudyplanHandler = (type) => {
-    setIsStudyplanCreated(true);
+    onEditHandler(true);
+    setIsStudyPlanCreated(true);
   }
 
   const getRightContainerClasses = () => {
     let classes = "col-span-2 grid grid-cols-1 gap-4 text-center border-2 border-gray-200 border-dashed rounded-md";
-    if (!isStudyplanCreated)
+    if (!isStudyPlanCreated)
       classes += " place-content-evenly ";
     if (isDragged)
       classes += " highlighted-border ";
     return classes;
   }
 
-  const onEditHandler = (mode) => {
-    ifOnEditSet = mode;
-    setOnEditMode(mode);
+  const onEditHandler = (action) => {
+    ifOnEditSet = action === 'edit';
+    setOnEditMode(ifOnEditSet);
+
+    switch (action) {
+      case 'edit':
+        setEditModeStudyplanCourses([...studyPlanCourses]);
+        break;
+      case 'save':
+        onStudySave();
+        break;
+      case 'cancel':
+        setEditModeStudyplanCourses([...studyPlanCourses]);
+        upDateCourseList(studyPlanCourses);
+        break;
+      default:
+        break;
+    }
   }
 
+  function onStudySave() {
+    studyPlanCourses = [...editModeStudyplanCourses];
+  }
+
+
+
+  function onDropAndAddToStudyPlan(el) {
+
+    const courseId = el.getAttribute('data-courseid');
+    const course = allCourses.find(x => x.id == courseId);
+    let newStudyCourses = [...editModeStudyplanCourses, course];
+    setEditModeStudyplanCourses(newStudyCourses);
+    upDateCourseList(newStudyCourses);
+  }
+
+  function upDateCourseList(newStudyCourses) {
+    for (let c1 of allCourses) {
+      c1.error = {
+        hasError: false,
+        messages: []
+
+      }
+    }
+
+    const enrolledCredits = newStudyCourses.reduce((sum, course) => sum += course.credit, 0);
+    for (let c1 of allCourses) {
+      let course = newStudyCourses.find(c2 => c2.id === c1.id);
+      if (course) {
+        c1.error.hasError = true;
+        c1.error.messages.push('The course is added already.');
+      }
+
+      course = newStudyCourses.find(c2 => !!c2.incompatibleCoursesId.find((incomp) => incomp === c1.id));
+      if (course) {
+        c1.error.hasError = true;
+        c1.error.messages.push(`The Course ${course.id} is incompatible with this course.`);
+      }
+
+      const newCreditIfAdded = enrolledCredits + c1.credit;
+      if (newCreditIfAdded > studyPlan.maxCredits) {
+        c1.error.hasError = true;
+        c1.error.messages.push(`By adding this course the enrolled credits would exceed the maximum.`);
+      }
+    }
+
+
+    setAllCourses([...allCourses]);
+  }
+
+
   const onCourseDeleteHandler = (element) => {
-    setStudyplanCourses(studyplanCourses.filter(el => el !== element))
+    let newStudyCourses = editModeStudyplanCourses.filter(el => el !== element);
+    setEditModeStudyplanCourses(newStudyCourses);
+    upDateCourseList(newStudyCourses);
   }
 
   return (
@@ -120,9 +219,28 @@ function UserPanelPage() {
 
         </div>
         <div id='right-container' className={getRightContainerClasses()}>
-          <div className='text-center'>
+          <div className='text-center relative'>
 
-            {!isStudyPlanDownloaded ? <Loading></Loading> : isStudyplanCreated ? <StudyPlan isEditMode={onEditMode} onDelete={onCourseDeleteHandler} onEdit={onEditHandler} courses={studyplanCourses}></StudyPlan> : <BlankStudyPlan onCreate={onCreateStudyplanHandler}></BlankStudyPlan>}
+            {
+              !isStudyPlanDownloaded
+                ?
+                <Loading></Loading>
+                :
+                isStudyPlanCreated
+                  ?
+                  <>
+                    <StudyPlan isEditMode={onEditMode} onDelete={onCourseDeleteHandler} onEdit={onEditHandler} courses={editModeStudyplanCourses}></StudyPlan>
+                    <div className="table-bottom">
+                      <span>Study plan type:&nbsp;</span>
+                      <span>{studyPlan.type}</span>
+                      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maximum credit:&nbsp;</span>
+                      <span>{studyPlan.maxCredits}</span>
+                      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enrolled credit:&nbsp;</span>
+                      <span>{editModeStudyplanCourses.reduce((sum, course) => sum += course.credit, 0)}</span>
+                    </div>
+                  </>
+                  :
+                  <BlankStudyPlan onCreate={onCreateStudyplanHandler}></BlankStudyPlan>}
 
           </div>
         </div>

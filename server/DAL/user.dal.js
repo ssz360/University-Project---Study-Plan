@@ -33,11 +33,10 @@ function userDAL() {
     this.seed = async () => {
 
         const ddd = await this.add({
-            username: 'user1@ezwh.com',
+            email: 'user@gmail.com',
             name: 'john',
             surname: 'snow',
             password: 'testpassword',
-            type: 'customer'
         });
     }
 
@@ -45,22 +44,30 @@ function userDAL() {
         let db = new DatabaseManagement();
 
         return await db.insertData(tableName, [
-            new insertFields("email", user.username),
+            new insertFields("email", user.email),
             new insertFields("name", user.name),
             new insertFields("surname", user.surname),
             new insertFields("password", user.password),
         ]);
     };
 
-    this.getAllUsers = async () => {
-        let db = new DatabaseManagement();
+    this.getUser = async (email, password) => {
+        let dbm = new DatabaseManagement();
 
+        const result = await new Promise((resolve, reject) => {
+            try {
+                let sql = `SELECT * FROM ${tableName} where email = ? and password = ? ;`;
 
-        const users = await db.getAllData(tableName);
-
-        if (!users) return null;
-
-        return users;
+                dbm.db.get(sql, [email, password], (err, data) => {
+                    if (err) reject(err);
+                    else resolve(data);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+        
+        return result;
     };
 }
 

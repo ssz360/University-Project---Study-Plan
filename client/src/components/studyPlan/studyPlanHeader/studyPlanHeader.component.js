@@ -8,7 +8,11 @@ function StudyPlanHeader(props) {
         <div className=" flex items-center justify-between pb-6">
             <div>
                 <h1 className="text-gray-600 font-semibold">Study Plan</h1>
-                <span className="text-xs">Choose wisely</span>
+                <span className="text-xs">
+                    
+                <button className="bg-red-600 px-1 py-1 text-xs rounded-md text-white font-semibold tracking-wide cursor-pointer">Delete Study Plan</button>
+
+                </span>
             </div>
             <div className="flex items-center justify-between">
                 {props.isInEditMode ?

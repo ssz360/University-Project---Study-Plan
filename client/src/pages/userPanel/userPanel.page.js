@@ -12,6 +12,8 @@ import AccordionList from '../../components/accordionList/accordion.component';
 import { getUserInfo, isUserLoggedIn } from '../../services/user.services';
 import { useNavigate } from "react-router-dom";
 import { getStudyPlan } from '../../services/sutyPlan.service';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 let fakeCourses = [
@@ -36,7 +38,7 @@ function UserPanelPage() {
   const [isStudyPlanCreated, setIsStudyPlanCreated] = useState(false);
   const [isStudyPlanDownloaded, setIsStudyPlanDownloaded] = useState(true);
   const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(true);
-  const [editModeStudyplanCourses, setEditModeStudyplanCourses] = useState([]);
+  const [editModeStudyplanCourses, setEditModeStudyPlanCourses] = useState([]);
   const [onEditMode, setOnEditMode] = useState(false);
   const [isDragged, setIsDragged] = useState(false);
   const [allCourses, setAllCourses] = useState(fakeCourses);
@@ -119,19 +121,23 @@ function UserPanelPage() {
   }
 
   const onEditHandler = (action) => {
-    ifOnEditSet = action === 'edit';
-    setOnEditMode(ifOnEditSet);
 
     switch (action) {
       case 'edit':
-        setEditModeStudyplanCourses([...studyPlanCourses]);
+        setEditModeStudyPlanCourses([...studyPlanCourses]);
+        ifOnEditSet = true;
+        setOnEditMode(ifOnEditSet);
         break;
       case 'save':
-        onStudySave();
+        const result = onStudySave();
+        ifOnEditSet = !result;
+        setOnEditMode(ifOnEditSet);
         break;
       case 'cancel':
-        setEditModeStudyplanCourses([...studyPlanCourses]);
+        setEditModeStudyPlanCourses([...studyPlanCourses]);
         upDateCourseList(studyPlanCourses);
+        ifOnEditSet = false;
+        setOnEditMode(ifOnEditSet);
         break;
       default:
         break;
@@ -139,7 +145,14 @@ function UserPanelPage() {
   }
 
   function onStudySave() {
-    studyPlanCourses = [...editModeStudyplanCourses];
+    const credits = editModeStudyplanCourses.reduce((sum, course) => sum + course.credit, 0);
+    if (credits > studyPlan.minCredits && studyPlan.maxCredits) {
+      studyPlanCourses = [...editModeStudyplanCourses];
+      return true;
+    } else {
+      toast.error(`Selected Credits Should be between ${studyPlan.minCredits} and ${studyPlan.maxCredits} CFS.`);
+      return false;
+    }
   }
 
 
@@ -149,7 +162,7 @@ function UserPanelPage() {
     const courseId = el.getAttribute('data-courseid');
     const course = allCourses.find(x => x.id == courseId);
     let newStudyCourses = [...editModeStudyplanCourses, course];
-    setEditModeStudyplanCourses(newStudyCourses);
+    setEditModeStudyPlanCourses(newStudyCourses);
     upDateCourseList(newStudyCourses);
   }
 
@@ -190,7 +203,7 @@ function UserPanelPage() {
 
   const onCourseDeleteHandler = (element) => {
     let newStudyCourses = editModeStudyplanCourses.filter(el => el !== element);
-    setEditModeStudyplanCourses(newStudyCourses);
+    setEditModeStudyPlanCourses(newStudyCourses);
     upDateCourseList(newStudyCourses);
   }
 
@@ -245,7 +258,7 @@ function UserPanelPage() {
           </div>
         </div>
       </div>
-
+      <ToastContainer />
 
     </>
   );

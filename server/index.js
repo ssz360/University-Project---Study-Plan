@@ -1,13 +1,20 @@
-const express = require('express')
-var cors = require('cors')
-const app = express()
-app.use(cors())
-const port = 3000
+const express = require('express');
+const {userApi} = require('./API/user.api');
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+var cors = require('cors');
+const app = express();
+app.use(cors());
+const port = 3000;
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+
+const init = async () => {
+  // ******************* initialize the APIs *************
+  await new userApi(app).init();
+  // *****************************************************
+}
+
+init().then(() => {
+  app.listen(port, () => {
+    console.log(`Server listening at http://localhost:${port}`);
+  });
+});

@@ -14,25 +14,12 @@ import { useNavigate } from "react-router-dom";
 import { getStudyPlan } from '../../services/sutyPlan.service';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import CourseService from '../../services/course.service';
 
 
-let fakeCourses = [
-  { id: '01OTWOV', name: 'Computer network technologies and services', credit: 6, enrolled: 3, maxStudents: 3, incompatibleCoursesId: ['02GOLOV'], incompatibleCourses: [], preparatoryCoursesId: ['01TXSOV'], preparatoryCourses: [] },
-  { id: '02GOLOV', name: 'Computer architectures', credit: 12, enrolled: 3, maxStudents: -1, incompatibleCoursesId: [], incompatibleCourses: [], preparatoryCoursesId: [], preparatoryCourses: [] },
-  { id: '01TXSOV', name: 'Web Applications II', credit: 6, enrolled: 3, maxStudents: -1, incompatibleCoursesId: ['01TXSOV'], incompatibleCourses: [], preparatoryCoursesId: ['01TXYOV'], preparatoryCourses: [] },
-  { id: '01TYDOV', name: 'Software networking', credit: 7, enrolled: 3, maxStudents: -1, incompatibleCoursesId: [], incompatibleCourses: [], preparatoryCoursesId: [], preparatoryCourses: [] },
-];
-
-/*************************************** temp ***************** */
-
-fakeCourses[0].incompatibleCourses.push(fakeCourses[1]);
-fakeCourses[0].preparatoryCourses.push(fakeCourses[2]);
-fakeCourses[2].incompatibleCourses.push(fakeCourses[1]);
-fakeCourses[2].preparatoryCourses.push(fakeCourses[2]);
-/************************************************* */
 let ifOnEditSet = false;
 let studyPlanCourses = [];
-
+let globalCourses = [];
 const userSrv = new UserService();
 
 function UserPanelPage() {
@@ -43,8 +30,10 @@ function UserPanelPage() {
   const [editModeStudyplanCourses, setEditModeStudyPlanCourses] = useState([]);
   const [onEditMode, setOnEditMode] = useState(false);
   const [isDragged, setIsDragged] = useState(false);
-  const [allCourses, setAllCourses] = useState(fakeCourses);
+  const [allCourses, setAllCourses] = useState([]);
   const [studyPlan, setStudyPlan] = useState();
+
+  const courseSrv = new CourseService();
 
   let navigate = useNavigate();
 
@@ -53,6 +42,14 @@ function UserPanelPage() {
   }
 
   useEffect(() => {
+
+    courseSrv.getAll().then(x => {
+      if (x) {
+        setAllCourses(x);
+        globalCourses = x;
+      }
+    })
+
     const studyPlan = getStudyPlan();
     if (studyPlan) {
       setIsStudyPlanCreated(true);
@@ -62,6 +59,8 @@ function UserPanelPage() {
     if (studyPlanCourses.length == 0) {
       onEditHandler('edit');
     }
+
+
   }, [])
 
   const dragulaDecorator = (componentBackingInstance) => {
@@ -73,7 +72,7 @@ function UserPanelPage() {
         },
         moves: function (el, source, handle, sibling) {
           const courseId = el.getAttribute('data-courseid');
-          const course = allCourses.find(x => x.id == courseId);
+          const course = globalCourses.find(x => x.code == courseId);
 
           if (!ifOnEditSet) return false;
           if (source.id !== 'courses-list')
@@ -162,7 +161,7 @@ function UserPanelPage() {
   function onDropAndAddToStudyPlan(el) {
 
     const courseId = el.getAttribute('data-courseid');
-    const course = allCourses.find(x => x.id == courseId);
+    const course = allCourses.find(x => x.code == courseId);
     let newStudyCourses = [...editModeStudyplanCourses, course];
     setEditModeStudyPlanCourses(newStudyCourses);
     upDateCourseList(newStudyCourses);
@@ -179,16 +178,16 @@ function UserPanelPage() {
 
     const enrolledCredits = newStudyCourses.reduce((sum, course) => sum += course.credit, 0);
     for (let c1 of allCourses) {
-      let course = newStudyCourses.find(c2 => c2.id === c1.id);
+      let course = newStudyCourses.find(c2 => c2.code === c1.code);
       if (course) {
         c1.error.hasError = true;
         c1.error.messages.push('The course is added already.');
       }
 
-      course = newStudyCourses.find(c2 => !!c2.incompatibleCoursesId.find((incomp) => incomp === c1.id));
+      course = newStudyCourses.find(c2 => !!c2.incompatibleCoursesId.find((incomp) => incomp === c1.code));
       if (course) {
         c1.error.hasError = true;
-        c1.error.messages.push(`The Course ${course.id} is incompatible with this course.`);
+        c1.error.messages.push(`The Course ${course.code} is incompatible with this course.`);
       }
 
       const newCreditIfAdded = enrolledCredits + c1.credit;

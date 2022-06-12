@@ -7,6 +7,7 @@ const passport = require('passport');
 const session = require('express-session');
 const { PassportService } = require('./Services/passport.service');
 const studyPlanApi = require('./API/studyPlan.api');
+const courseApi = require('./API/course.api');
 
 const app = express();
 const port = 3001;
@@ -39,7 +40,7 @@ const init = async () => {
   // ******************* initialize the APIs *************
   await new userApi(app, authSrv).init();
   await new studyPlanApi(app, authSrv).init();
-
+  await new courseApi(app,authSrv).init();
 
   // *****************************************************
 

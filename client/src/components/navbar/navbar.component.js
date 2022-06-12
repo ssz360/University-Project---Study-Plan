@@ -1,8 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.services";
 
 const userSrv = new UserService();
 function Navbar() {
+  const navigation = useNavigate();
+
+  function onLogout() {
+    const result = new UserService().logout();
+    if (result) {
+      navigation('/');
+    }
+  }
+
   return (
     <>
       <nav className="bg-gray-800">
@@ -28,7 +37,7 @@ function Navbar() {
                     <div className="ml-3 relative">
                       <div className="text-white">
                         <span>Hello Amir</span>
-                        <button className="bg-gray-600 ml-5 px-2 py-1 rounded-md text-white font-semibold tracking-wide cursor-pointer">Log out</button>
+                        <button onClick={onLogout} className="bg-gray-600 ml-5 px-2 py-1 rounded-md text-white font-semibold tracking-wide cursor-pointer">Log out</button>
                       </div>
                     </div>
 

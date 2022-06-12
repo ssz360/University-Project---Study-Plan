@@ -50,17 +50,17 @@ function userDAL() {
         });
     }
 
-    // this.add = async (user) => {
-    //     let db = new DatabaseManagement();
+    this.add = async (user) => {
+        let db = new DatabaseManagement();
 
-    //     return await db.insertData(tableName, [
-    //         new insertFields("email", user.email),
-    //         new insertFields("name", user.name),
-    //         new insertFields("surname", user.surname),
-    //         new insertFields("password", user.password),
-    //         new insertFields("salt", user.salt),
-    //     ]);
-    // };
+        return await db.insertData(tableName, [
+            new insertFields("email", user.email),
+            new insertFields("name", user.name),
+            new insertFields("surname", user.surname),
+            new insertFields("password", user.password),
+            new insertFields("salt", user.salt),
+        ]);
+    };
 
     this.getUser = async (email) => {
         // let dbm = new DatabaseManagement();

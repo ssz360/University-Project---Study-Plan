@@ -7,28 +7,19 @@ import AccordionList from '../../components/accordionList/accordion.component';
 import CourseDetails from '../../components/corseDetails/corseDetails.component';
 import { useNavigate } from 'react-router-dom';
 import UserService from '../../services/user.services';
+import HttpService from '../../services/_baseHttpRequests';
+import CourseService from '../../services/course.service';
 
-let allCourses = [
-  { id: '01OTWOV', name: 'Computer network technologies and services', credit: 6, enrolled: 3, maxStudents: 3, incompatibleCoursesId: ['02GOLOV'], incompatibleCourses: [], preparatoryCoursesId: ['01TXSOV'], preparatoryCourses: [] },
-  { id: '02GOLOV', name: 'Computer architectures', credit: 12, enrolled: 3, maxStudents: -1, incompatibleCoursesId: [], incompatibleCourses: [], preparatoryCoursesId: [], preparatoryCourses: [] },
-  { id: '01TXSOV', name: 'Web Applications II', credit: 6, enrolled: 3, maxStudents: -1, incompatibleCoursesId: ['01TXSOV'], incompatibleCourses: [], preparatoryCoursesId: ['01TXYOV'], preparatoryCourses: [] },
-  { id: '01TYDOV', name: 'Software networking', credit: 7, enrolled: 3, maxStudents: -1, incompatibleCoursesId: [], incompatibleCourses: [], preparatoryCoursesId: [], preparatoryCourses: [] },
-];
 
-/*************************************** temp ***************** */
-
-allCourses[0].incompatibleCourses.push(allCourses[1]);
-allCourses[0].preparatoryCourses.push(allCourses[2]);
-allCourses[2].incompatibleCourses.push(allCourses[1]);
-allCourses[2].preparatoryCourses.push(allCourses[2]);
-/************************************************* */
-
-const userSrv = new UserService();
 
 function MainPage() {
 
+  const [allCourses, setAllCourses] = useState([]);
   const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(true);
   const [selectedCourse, setSelectedCrouse] = useState();
+
+  const courseSrv = new CourseService();
+  const userSrv = new UserService();
 
   let navigate = useNavigate();
 
@@ -39,7 +30,14 @@ function MainPage() {
   }
 
   useEffect(() => {
-    onAccordionClickHandler(allCourses[0]);
+
+    courseSrv.getAll().then(x => {
+      if(x){
+        setAllCourses(x);
+        onAccordionClickHandler(x[0]);
+      }
+    })
+
 
   }, []);
 

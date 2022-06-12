@@ -43,7 +43,7 @@ function StudyPlanTable(props) {
                         <tbody className="p-5">
                             {
                                 courses.length ?
-                                    courses.map(course => <StudyPlanTableElement isEditMode={props.isEditMode} onDelete={props.onDelete} key={'tbl' + course.id} course={course}></StudyPlanTableElement>)
+                                    courses.map(course => <StudyPlanTableElement isEditMode={props.isEditMode} onDelete={props.onDelete} key={'tbl' + course.code} course={course}></StudyPlanTableElement>)
                                     :
                                     <tr ><td colSpan="2">No Courses Are Added Yet</td></tr>
                             }

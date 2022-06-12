@@ -12,7 +12,7 @@ function UserService() {
 
             const result = await http.post(baseUrl + 'api/login', { email: username, password });
             if (result.status == 201) {
-                const data = result.json();
+                const data = await result.json();
                 storage.setData('user', data);
                 resolve(data);
             }
@@ -22,6 +22,20 @@ function UserService() {
         });
     }
 
+
+    this.logout = () => {
+        return new Promise(async (resolve, reject) => {
+
+            const result = await http.post(baseUrl + 'api/logout', {});
+            if (result.status == 200) {
+                storage.deleteData('user');
+                resolve(true);
+            }
+            else
+                resolve(false);
+
+        });
+    }
 
 
     this.isUserLoggedIn = () => {

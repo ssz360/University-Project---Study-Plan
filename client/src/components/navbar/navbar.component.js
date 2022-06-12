@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { isUserLoggedIn } from "../../services/user.services";
+import UserService from "../../services/user.services";
 
+const userSrv = new UserService();
 function Navbar() {
   return (
     <>
@@ -12,7 +13,7 @@ function Navbar() {
                 <span className="sr-only">Open main menu</span>
               </button>
             </div>
-            <Link to={isUserLoggedIn() ? '/user-panel' : '/'}>
+            <Link to={userSrv.isUserLoggedIn() ? '/user-panel' : '/'}>
               <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex-shrink-0 flex items-center">
                   <img className="block lg:hidden h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow" />
@@ -22,7 +23,7 @@ function Navbar() {
             </Link>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               {
-                isUserLoggedIn() ?
+                userSrv.isUserLoggedIn() ?
                   <>
                     <div className="ml-3 relative">
                       <div className="text-white">

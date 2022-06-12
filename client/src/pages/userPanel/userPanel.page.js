@@ -9,7 +9,7 @@ import Dragula from 'react-dragula';
 import Loading from '../../components/loading/loading.component';
 import { useEffect, useState } from 'react';
 import AccordionList from '../../components/accordionList/accordion.component';
-import { getUserInfo, isUserLoggedIn } from '../../services/user.services';
+import UserService from '../../services/user.services';
 import { useNavigate } from "react-router-dom";
 import { getStudyPlan } from '../../services/sutyPlan.service';
 import { ToastContainer, toast } from 'react-toastify';
@@ -33,6 +33,8 @@ fakeCourses[2].preparatoryCourses.push(fakeCourses[2]);
 let ifOnEditSet = false;
 let studyPlanCourses = [];
 
+const userSrv = new UserService();
+
 function UserPanelPage() {
 
   const [isStudyPlanCreated, setIsStudyPlanCreated] = useState(false);
@@ -46,12 +48,12 @@ function UserPanelPage() {
 
   let navigate = useNavigate();
 
-  if (!isUserLoggedIn()) {
+  if (!userSrv.isUserLoggedIn()) {
     navigate('/');
   }
 
   useEffect(() => {
-    const studyPlan = getStudyPlan(getUserInfo());
+    const studyPlan = getStudyPlan();
     if (studyPlan) {
       setIsStudyPlanCreated(true);
       setStudyPlan(studyPlan);

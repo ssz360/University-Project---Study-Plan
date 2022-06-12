@@ -1,4 +1,4 @@
-function getStudyPlan(user) {
+function getStudyPlan() {
     return {
         type: 'Full time',
         maxCredits: 13,

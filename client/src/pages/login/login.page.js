@@ -1,12 +1,25 @@
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import UserService from "../../services/user.services";
 import "./login.css"
 function LoginPage() {
   let navigate = useNavigate();
 
-  const onLoginHandler = () => {
-    console.log(999);
-    navigate('/user-panel');
+  const [username, setUsername] = useState();
+  const [password, setPassword] = useState();
+
+  const onLoginHandler = async () => {
+    const userSrv = new UserService();
+    const result = await userSrv.login(username, password);
+    if (result) {
+      navigate('/user-panel');
+    }
   }
+
+  useEffect(()=>{
+    setPassword('testpassword');
+    setUsername('user@gmail.com');
+  })
 
   return (
     <>
@@ -23,14 +36,14 @@ function LoginPage() {
               <div className="sign-in-htm">
                 <div className="group">
                   <label htmlFor="user" className="label">Username</label>
-                  <input id="user" type="text" className="input" />
+                  <input onChange={(e) => setUsername(e.target.value)} defaultValue={username} id="user" type="text" className="input" />
                 </div>
                 <div className="group">
                   <label htmlFor="pass" className="label">Password</label>
-                  <input id="pass" type="password" className="input" data-type="password" />
+                  <input onChange={(e) => setPassword(e.target.value)} defaultValue={password} id="pass" type="password" className="input" data-type="password" />
                 </div>
                 <div className="group">
-                  <input onClick={() => onLoginHandler()}  type="submit" className="button cursor-pointer" value="Sign In" />
+                  <input onClick={() => onLoginHandler()} type="submit" className="button cursor-pointer" value="Sign In" />
                 </div>
                 <div className="hr"></div>
                 {/* <div className="foot-lnk">
@@ -55,7 +68,7 @@ function LoginPage() {
                   <input id="pass" type="text" className="input" />
                 </div>
                 <div className="group">
-                  <input onClick={() => onLoginHandler()}  type="submit" className="button cursor-pointer" value="Sign Up" />
+                  <input onClick={() => onLoginHandler()} type="submit" className="button cursor-pointer" value="Sign Up" />
                 </div>
                 <div className="hr"></div>
                 <div className="foot-lnk">

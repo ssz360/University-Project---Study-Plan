@@ -1,22 +1,21 @@
 const DatabaseManagement = require("./_baseDalFunctionalities").DatabaseManagement;
 const insertFields = require("../Models/insertFields.model").insertFields;
 const creationTableFields = require("../Models/creationTableFields.model").creationTableFields;
-const path = require("path");
 const crypto = require('crypto');
 
 function userDAL() {
     const tableName = "user";
+    let dbm = new DatabaseManagement();
 
     this._crateTable = async () => {
-        let db = new DatabaseManagement();
 
         const sql = `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';`
 
-        db.db.all(sql, async (err, data) => {
+        dbm.db.all(sql, async (err, data) => {
             if (err) reject(err);
             else {
                 if (!data.length) {
-                    const f = await db.createTable(tableName, [
+                    const f = await dbm.createTable(tableName, [
                         new creationTableFields("id", "integer", false, true, true, true),
                         new creationTableFields("name", "text"),
                         new creationTableFields("surname", "text"),
@@ -51,20 +50,20 @@ function userDAL() {
         });
     }
 
-    this.add = async (user) => {
-        let db = new DatabaseManagement();
+    // this.add = async (user) => {
+    //     let db = new DatabaseManagement();
 
-        return await db.insertData(tableName, [
-            new insertFields("email", user.email),
-            new insertFields("name", user.name),
-            new insertFields("surname", user.surname),
-            new insertFields("password", user.password),
-            new insertFields("salt", user.salt),
-        ]);
-    };
+    //     return await db.insertData(tableName, [
+    //         new insertFields("email", user.email),
+    //         new insertFields("name", user.name),
+    //         new insertFields("surname", user.surname),
+    //         new insertFields("password", user.password),
+    //         new insertFields("salt", user.salt),
+    //     ]);
+    // };
 
     this.getUser = async (email) => {
-        let dbm = new DatabaseManagement();
+        // let dbm = new DatabaseManagement();
 
         const result = await new Promise((resolve, reject) => {
             try {
@@ -83,4 +82,4 @@ function userDAL() {
     };
 }
 
-exports.userDAL = userDAL;
+module.exports=  userDAL;

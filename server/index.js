@@ -1,14 +1,15 @@
 const express = require('express');
-const { userApi } = require('./API/user.api');
+const userApi = require('./API/user.api');
 var cors = require('cors');
 const morgan = require('morgan');
 
 const passport = require('passport');
 const session = require('express-session');
 const { PassportService } = require('./Services/passport.service');
+const studyPlanApi = require('./API/studyPlan.api');
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 const authSrv = new PassportService();
 
@@ -37,7 +38,7 @@ const init = async () => {
 
   // ******************* initialize the APIs *************
   await new userApi(app, authSrv).init();
-
+  await new studyPlanApi(app, authSrv).init();
 
 
   // *****************************************************

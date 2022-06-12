@@ -6,7 +6,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import AccordionList from '../../components/accordionList/accordion.component';
 import CourseDetails from '../../components/corseDetails/corseDetails.component';
 import { useNavigate } from 'react-router-dom';
-import { isUserLoggedIn } from '../../services/user.services';
+import UserService from '../../services/user.services';
 
 let allCourses = [
   { id: '01OTWOV', name: 'Computer network technologies and services', credit: 6, enrolled: 3, maxStudents: 3, incompatibleCoursesId: ['02GOLOV'], incompatibleCourses: [], preparatoryCoursesId: ['01TXSOV'], preparatoryCourses: [] },
@@ -22,6 +22,9 @@ allCourses[0].preparatoryCourses.push(allCourses[2]);
 allCourses[2].incompatibleCourses.push(allCourses[1]);
 allCourses[2].preparatoryCourses.push(allCourses[2]);
 /************************************************* */
+
+const userSrv = new UserService();
+
 function MainPage() {
 
   const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(true);
@@ -40,7 +43,7 @@ function MainPage() {
 
   }, []);
 
-  if (isUserLoggedIn()) {
+  if (userSrv.isUserLoggedIn()) {
     navigate('/user-panel');
     return;
   }

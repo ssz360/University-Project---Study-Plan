@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
-const { userDAL } = require("../DAL/user.dal");
+const  userDAL  = require("../DAL/user.dal");
 
 function PassportService() {
     const dal = new userDAL();
@@ -23,12 +23,13 @@ function PassportService() {
             if (!result)
                 return cb(null, false, { message: 'Incorrect username or password.' });
 
-            return cb(null, { email: user.email, name: user.name });
+            return cb(null, user);
 
         }));
 
         passport.serializeUser(function (user, cb) {
             delete user.password;
+            delete user.salt;
             cb(null, user);
         });
 

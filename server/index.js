@@ -21,7 +21,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(session({
-  secret: "shhhhh... it's a secret!",
+  secret: "e5cd051bf11699ed58cffe96e1b73ca5",
   resave: false,
   saveUninitialized: false,
 }));

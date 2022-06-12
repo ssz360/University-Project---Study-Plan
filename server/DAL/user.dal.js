@@ -1,9 +1,9 @@
-const DatabaseManagement =
-    require("./_baseDalFunctionalities").DatabaseManagement;
+const DatabaseManagement = require("./_baseDalFunctionalities").DatabaseManagement;
 const insertFields = require("../Models/insertFields.model").insertFields;
-const creationTableFields =
-    require("../Models/creationTableFields.model").creationTableFields;
-var path = require("path");
+const creationTableFields = require("../Models/creationTableFields.model").creationTableFields;
+const path = require("path");
+const crypto = require('crypto');
+
 function userDAL() {
     const tableName = "user";
 
@@ -22,6 +22,7 @@ function userDAL() {
                         new creationTableFields("surname", "text"),
                         new creationTableFields("email", "text"),
                         new creationTableFields("password", "text"),
+                        new creationTableFields("salt", "text"),
                     ]);
 
                     await this.seed();
@@ -32,11 +33,21 @@ function userDAL() {
 
     this.seed = async () => {
 
-        const ddd = await this.add({
+        const user = {
             email: 'user@gmail.com',
             name: 'john',
             surname: 'snow',
-            password: 'testpassword',
+
+        };
+
+        const pass = 'testpassword';
+        user.salt = crypto.randomBytes(32).toString('hex');
+
+        crypto.scrypt(pass, user.salt, 32, async (err, hashedPassword) => {
+            if (!err) {
+                user.password = hashedPassword.toString('hex');
+                await this.add(user);
+            }
         });
     }
 
@@ -48,17 +59,18 @@ function userDAL() {
             new insertFields("name", user.name),
             new insertFields("surname", user.surname),
             new insertFields("password", user.password),
+            new insertFields("salt", user.salt),
         ]);
     };
 
-    this.getUser = async (email, password) => {
+    this.getUser = async (email) => {
         let dbm = new DatabaseManagement();
 
         const result = await new Promise((resolve, reject) => {
             try {
-                let sql = `SELECT * FROM ${tableName} where email = ? and password = ? ;`;
+                let sql = `SELECT * FROM ${tableName} where email = ?;`;
 
-                dbm.db.get(sql, [email, password], (err, data) => {
+                dbm.db.get(sql, [email], (err, data) => {
                     if (err) reject(err);
                     else resolve(data);
                 });
@@ -66,7 +78,7 @@ function userDAL() {
                 reject(error);
             }
         });
-        
+
         return result;
     };
 }

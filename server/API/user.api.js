@@ -8,8 +8,9 @@ function userApi(app, authSrv) {
     this.init = async () => {
         await userDal._crateTable();
 
-        this.getUserInfo();
+        // this.getUserInfo();
         this.login();
+        this.logout();
     };
 
     // this.getUserInfo = () => {
@@ -21,8 +22,16 @@ function userApi(app, authSrv) {
     // };
 
     this.login = () => {
-        app.post('/login', function (req, res, next) {
+        app.post('/api/login', function (req, res, next) {
             authSrv.authenticate(req, res, next);
+        });
+    }
+
+    this.logout = () => {
+        app.post('/api/logout', (req, res) => {
+            req.logout(() => {
+                res.end();
+            });
         });
     }
 }

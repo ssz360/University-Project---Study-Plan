@@ -42,6 +42,11 @@ function UserService() {
         return storage.getData('user');
     }
 
+
+    this.getUserData = () => {
+        return storage.getData('user');
+    }
+
 }
 
 export default UserService;

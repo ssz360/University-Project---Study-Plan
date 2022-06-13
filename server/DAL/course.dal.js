@@ -1,10 +1,12 @@
 const DatabaseManagement = require("./_baseDalFunctionalities").DatabaseManagement;
 const insertFields = require("../Models/insertFields.model").insertFields;
 const creationTableFields = require("../Models/creationTableFields.model").creationTableFields;
+const studyCourseRelationDAL = require("../DAL/studyCourseRelation.dal");
 
 function courseDAL() {
     const tableName = "course";
     let dbm = new DatabaseManagement();
+    const scrDal = new studyCourseRelationDAL();
 
     this._crateTable = async () => {
 
@@ -215,7 +217,9 @@ function courseDAL() {
 
     this.getAll = async () => {
         const courses = await dbm.getAllData(tableName);
-        return courses.map(el => {
+
+        const result = [];
+        for (let el of courses) {
 
             const course = { ...el };
             course.incompatibleCoursesId = course.incompatibleCoursesId ? course.incompatibleCoursesId.split(',') : [];
@@ -224,15 +228,18 @@ function courseDAL() {
             course.incompatibleCourses = [];
             course.preparatoryCourses = [];
 
+            course.enrolled = (await scrDal.getByCourse(course.id)).length;
+
             for (let el of course.incompatibleCoursesId) {
-                course.incompatibleCourses.push([...courses].find(x => x.code === el ));
+                course.incompatibleCourses.push([...courses].find(x => x.code === el));
             }
             for (let el of course.preparatoryCoursesId) {
-                course.preparatoryCourses.push(courses.find(x => x.code === el ));
+                course.preparatoryCourses.push(courses.find(x => x.code === el));
             }
 
-            return course;
-        });
+            result.push(course);
+        }
+        return result;
     }
 
     this.add = async (course) => {

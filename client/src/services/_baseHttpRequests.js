@@ -1,14 +1,10 @@
 function HttpService() {
 
-    this.post = async (url = '', data = {}, hasCredentials = false) => {
+    this.post = async (url = '', data = {}) => {
         const response = await fetch(url, {
             method: 'POST',
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: hasCredentials ? 'same-origin' : undefined,
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
         return response;
@@ -19,7 +15,26 @@ function HttpService() {
             method: 'GET',
             mode: 'cors',
             cache: 'no-cache',
-            credentials: hasCredentials ? 'same-origin' : undefined,
+            credentials: hasCredentials ? 'include' : undefined,
+        });
+        return response;
+    }
+    this.delete = async (url = '', hasCredentials = false) => {
+        const response = await fetch(url, {
+            method: 'DELETE',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: hasCredentials ? 'include' : undefined,
+        });
+        return response;
+    }
+
+    this.put = async (url = '', data = {}) => {
+        const response = await fetch(url, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
         return response;
     }

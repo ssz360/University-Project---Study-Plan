@@ -10,7 +10,7 @@ function StudyPlanHeader(props) {
                 <h1 className="text-gray-600 font-semibold">Study Plan</h1>
                 <span className="text-xs">
                     
-                <button className="bg-red-600 px-1 py-1 text-xs rounded-md text-white font-semibold tracking-wide cursor-pointer">Delete Study Plan</button>
+                <button onClick={()=> props.onStudyPlanDelete()} className="bg-red-600 px-1 py-1 text-xs rounded-md text-white font-semibold tracking-wide cursor-pointer">Delete Study Plan</button>
 
                 </span>
             </div>

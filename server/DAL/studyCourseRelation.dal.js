@@ -25,9 +25,14 @@ function studyCourseRelationDAL() {
     }
 
 
-    this.get = async (studyPlanId) => {
+    this.getByStudyPlan = async (studyPlanId) => {
         return await dbm.getAllData(tableName, 'spId = ' + studyPlanId);
     }
+
+    this.getByCourse  = async (courseId)=>{
+        return await dbm.getAllData(tableName, 'cId = ' + courseId);
+    }
+
 
     this.add = async (spId, cId) => {
         return await dbm.insertData(tableName,
@@ -37,11 +42,11 @@ function studyCourseRelationDAL() {
             ]);
     }
 
-    this.delete = async (id) => {
-        return await dbm.delete(tableName, id);
+    this.delete = async (studyPlanId) => {
+        return await dbm.deleteByWhereCondition(tableName, 'spId = ' + studyPlanId);
     }
 
 
 }
 
-module.exports= studyCourseRelationDAL;
+module.exports = studyCourseRelationDAL;

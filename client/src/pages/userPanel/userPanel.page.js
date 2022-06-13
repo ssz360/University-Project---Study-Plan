@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import AccordionList from '../../components/accordionList/accordion.component';
 import UserService from '../../services/user.services';
 import { useNavigate } from "react-router-dom";
-import { getStudyPlan } from '../../services/sutyPlan.service';
+import StudyPlanService from '../../services/sutyPlan.service';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CourseService from '../../services/course.service';
@@ -20,7 +20,6 @@ import CourseService from '../../services/course.service';
 let ifOnEditSet = false;
 let studyPlanCourses = [];
 let globalCourses = [];
-const userSrv = new UserService();
 
 function UserPanelPage() {
 
@@ -33,7 +32,9 @@ function UserPanelPage() {
   const [allCourses, setAllCourses] = useState([]);
   const [studyPlan, setStudyPlan] = useState();
 
+  const userSrv = new UserService();
   const courseSrv = new CourseService();
+  const studyPlanSrv = new StudyPlanService();
 
   let navigate = useNavigate();
 
@@ -47,18 +48,12 @@ function UserPanelPage() {
       if (x) {
         setAllCourses(x);
         globalCourses = x;
+        getStudyPlan().then((studyPlan) => {
+          upDateCourseList(studyPlan.courses, studyPlan);
+        });
       }
     })
 
-    const studyPlan = getStudyPlan();
-    if (studyPlan) {
-      setIsStudyPlanCreated(true);
-      setStudyPlan(studyPlan);
-    }
-    studyPlanCourses = studyPlan.addedCourses;
-    if (studyPlanCourses.length == 0) {
-      onEditHandler('edit');
-    }
 
 
   }, [])
@@ -107,9 +102,35 @@ function UserPanelPage() {
     }
   };
 
-  const onCreateStudyplanHandler = (type) => {
-    onEditHandler(true);
-    setIsStudyPlanCreated(true);
+  async function getStudyPlan() {
+    const studyPlan = await studyPlanSrv.getStudyPlan()
+
+    if (studyPlan) {
+      setIsStudyPlanCreated(true);
+      setStudyPlan(studyPlan);
+      studyPlanCourses = studyPlan.courses ? studyPlan.courses : [];
+      setEditModeStudyPlanCourses(studyPlanCourses);
+
+      if (studyPlanCourses?.length == 0) {
+        onEditHandler('edit');
+      }
+    }
+    return studyPlan;
+  }
+
+  const onCreateStudyPlanHandler = async (type) => {
+
+    const result = await studyPlanSrv.addNewPlan(type);
+    if (!result.hasError) {
+      console.log(result);
+      setStudyPlan(result);
+      onEditHandler(true);
+      setIsStudyPlanCreated(true);
+
+    } else {
+      console.log(result);
+      //******************************show error message  */
+    }
   }
 
   const getRightContainerClasses = () => {
@@ -121,22 +142,22 @@ function UserPanelPage() {
     return classes;
   }
 
-  const onEditHandler = (action) => {
+  const onEditHandler = async (action) => {
 
     switch (action) {
       case 'edit':
-        setEditModeStudyPlanCourses([...studyPlanCourses]);
+        setEditModeStudyPlanCourses(studyPlanCourses ? [...studyPlanCourses] : []);
         ifOnEditSet = true;
         setOnEditMode(ifOnEditSet);
         break;
       case 'save':
-        const result = onStudySave();
+        const result = await onStudySave();
         ifOnEditSet = !result;
         setOnEditMode(ifOnEditSet);
         break;
       case 'cancel':
-        setEditModeStudyPlanCourses([...studyPlanCourses]);
-        upDateCourseList(studyPlanCourses);
+        setEditModeStudyPlanCourses(studyPlanCourses ? [...studyPlanCourses] : []);
+        upDateCourseList(studyPlanCourses ? [...studyPlanCourses] : []);
         ifOnEditSet = false;
         setOnEditMode(ifOnEditSet);
         break;
@@ -145,14 +166,31 @@ function UserPanelPage() {
     }
   }
 
-  function onStudySave() {
-    const credits = editModeStudyplanCourses.reduce((sum, course) => sum + course.credit, 0);
-    if (credits > studyPlan.minCredits && studyPlan.maxCredits) {
-      studyPlanCourses = [...editModeStudyplanCourses];
-      return true;
-    } else {
-      toast.error(`Selected Credits Should be between ${studyPlan.minCredits} and ${studyPlan.maxCredits} CFS.`);
-      return false;
+  async function onStudySave() {
+
+    if (studyPlan?.id) {
+
+
+      const credits = editModeStudyplanCourses.reduce((sum, course) => sum + course.credit, 0);
+      if (credits >= studyPlan.minCredits && credits <= studyPlan.maxCredits) {
+        studyPlanCourses = [...editModeStudyplanCourses];
+
+        const coursesId = editModeStudyplanCourses.map(x => x.id);
+        await studyPlanSrv.editPlanCourses(studyPlan.id, coursesId);
+        await getStudyPlan();
+
+        courseSrv.getAll().then(x => {
+          if (x) {
+            setAllCourses(x);
+            globalCourses = x;
+          }
+        })
+
+        return true;
+      } else {
+        toast.error(`Selected Credits Should be between ${studyPlan.minCredits} and ${studyPlan.maxCredits} CFS.`);
+        return false;
+      }
     }
   }
 
@@ -161,14 +199,15 @@ function UserPanelPage() {
   function onDropAndAddToStudyPlan(el) {
 
     const courseId = el.getAttribute('data-courseid');
-    const course = allCourses.find(x => x.code == courseId);
+    const course = globalCourses.find(x => x.code == courseId);
     let newStudyCourses = [...editModeStudyplanCourses, course];
     setEditModeStudyPlanCourses(newStudyCourses);
     upDateCourseList(newStudyCourses);
   }
 
-  function upDateCourseList(newStudyCourses) {
-    for (let c1 of allCourses) {
+  function upDateCourseList(newStudyCourses, plan) {
+    plan = plan ? plan : studyPlan;
+    for (let c1 of globalCourses) {
       c1.error = {
         hasError: false,
         messages: []
@@ -177,7 +216,7 @@ function UserPanelPage() {
     }
 
     const enrolledCredits = newStudyCourses.reduce((sum, course) => sum += course.credit, 0);
-    for (let c1 of allCourses) {
+    for (let c1 of globalCourses) {
       let course = newStudyCourses.find(c2 => c2.code === c1.code);
       if (course) {
         c1.error.hasError = true;
@@ -191,14 +230,13 @@ function UserPanelPage() {
       }
 
       const newCreditIfAdded = enrolledCredits + c1.credit;
-      if (newCreditIfAdded > studyPlan.maxCredits) {
+      if (newCreditIfAdded > plan.maxCredits) {
         c1.error.hasError = true;
         c1.error.messages.push(`By adding this course the enrolled credits would exceed the maximum.`);
       }
     }
 
-
-    setAllCourses([...allCourses]);
+    setAllCourses([...globalCourses]);
   }
 
 
@@ -206,6 +244,17 @@ function UserPanelPage() {
     let newStudyCourses = editModeStudyplanCourses.filter(el => el !== element);
     setEditModeStudyPlanCourses(newStudyCourses);
     upDateCourseList(newStudyCourses);
+  }
+
+  const onStudyPlanDeleteHandler = async () => {
+    await studyPlanSrv.delete();
+    setStudyPlan({});
+    setIsStudyPlanCreated(false);
+    studyPlanCourses = [];
+    setEditModeStudyPlanCourses([]);
+
+    upDateCourseList([]);
+    onEditHandler(false);
   }
 
   return (
@@ -243,7 +292,7 @@ function UserPanelPage() {
                 isStudyPlanCreated
                   ?
                   <>
-                    <StudyPlan isEditMode={onEditMode} onDelete={onCourseDeleteHandler} onEdit={onEditHandler} courses={editModeStudyplanCourses}></StudyPlan>
+                    <StudyPlan onStudyPlanDelete={onStudyPlanDeleteHandler} isEditMode={onEditMode} onDelete={onCourseDeleteHandler} onEdit={onEditHandler} courses={editModeStudyplanCourses}></StudyPlan>
                     <div className="table-bottom">
                       <span>Study plan type:&nbsp;</span>
                       <span>{studyPlan.type}</span>
@@ -254,7 +303,7 @@ function UserPanelPage() {
                     </div>
                   </>
                   :
-                  <BlankStudyPlan onCreate={onCreateStudyplanHandler}></BlankStudyPlan>}
+                  <BlankStudyPlan onCreate={onCreateStudyPlanHandler}></BlankStudyPlan>}
 
           </div>
         </div>

@@ -1,11 +1,14 @@
+const courseBAL = require("../BAL/course.bal");
+const courseDAL = require("./course.dal");
+
 const DatabaseManagement = require("./_baseDalFunctionalities").DatabaseManagement;
 const insertFields = require("../Models/insertFields.model").insertFields;
 const creationTableFields = require("../Models/creationTableFields.model").creationTableFields;
-const studyCourseRelationDAL = require("./studyCourseRelation.dal");
 
 function studyPlanDAL() {
     const tableName = "studyPlan";
     let dbm = new DatabaseManagement();
+    let coursesBal = new courseBAL(new courseDAL());
 
     this._crateTable = async () => {
 
@@ -17,8 +20,8 @@ function studyPlanDAL() {
                 if (!data.length) {
                     const f = await dbm.createTable(tableName, [
                         new creationTableFields("id", "integer", false, true, true, true),
-                        new creationTableFields("minCredit", "integer"),
-                        new creationTableFields("maxCredit", "integer"),
+                        new creationTableFields("minCredits", "integer"),
+                        new creationTableFields("maxCredits", "integer"),
                         new creationTableFields("type", "text"),
                         new creationTableFields("userId", "integer")
                     ]);
@@ -28,41 +31,45 @@ function studyPlanDAL() {
     }
 
 
-    this.getOne = async (userId) => {
-        const sp = await dbm.getAllData(tableName, 'userId = ' + userId)[0];
-        if (sp) {
-            const scrDAL = new studyCourseRelationDAL();
-            const courses = await scrDAL.get(sp.id);
-            sp.courses = courses;
-        }
-        return sp;
+    this.getOne = (userId) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const sp = (await dbm.getAllData(tableName, 'userId = ' + userId))[0];
+                if (sp) {
+                    const courses = await coursesBal.getAll();
+                    sp.courses = [];
+
+                    const sql = 'select * from course join scr on course.id = scr.cid where spId = ?';
+                    dbm.db.all(sql, [sp.id], (err, data) => {
+                        if (err) reject(err);
+                        for (let el of data) {
+                            let course = courses.response.find(x => x.code == el.code);
+                            if (course) {
+                                sp.courses.push(course);
+                            }
+                        }
+                        resolve(sp);
+                    })
+                }
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     this.add = async (studyPlan, userId) => {
         return await dbm.insertData(tableName,
             [
-                new insertFields("maxCredit", studyPlan.maxCredit),
-                new insertFields("minCredit", studyPlan.minCredit),
+                new insertFields("maxCredits", studyPlan.maxCredits),
+                new insertFields("minCredits", studyPlan.minCredits),
                 new insertFields("type", studyPlan.type),
                 new insertFields("userId", userId)
             ]);
     }
 
-    // this.edit = async (studyPlan, spId) => {
-    //     return await dbm.updateData(tableName,
-    //         [
-    //             new insertFields("maxCredit", studyPlan.maxCredit),
-    //             new insertFields("minCredit", studyPlan.minCredit),
-    //             new insertFields("type", studyPlan.type)
-    //         ],
-    //         'id = ' + spId
-    //     )
-    // }
-
-    this.delete = async (spId) => {
-        return await dbm.delete(tableName, spId);
+    this.delete = async (userId) => {
+        return await dbm.deleteByWhereCondition(tableName, 'userId = ' + userId);
     }
-
 
 }
 

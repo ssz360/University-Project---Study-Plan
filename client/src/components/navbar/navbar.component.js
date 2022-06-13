@@ -4,9 +4,10 @@ import UserService from "../../services/user.services";
 const userSrv = new UserService();
 function Navbar() {
   const navigation = useNavigate();
+  const user = userSrv.getUserData();
 
   function onLogout() {
-    const result = new UserService().logout();
+    const result = userSrv.logout();
     if (result) {
       navigation('/');
     }
@@ -36,7 +37,7 @@ function Navbar() {
                   <>
                     <div className="ml-3 relative">
                       <div className="text-white">
-                        <span>Hello Amir</span>
+                        <span>Hello {user.name + ' ' + user.surname}</span>
                         <button onClick={onLogout} className="bg-gray-600 ml-5 px-2 py-1 rounded-md text-white font-semibold tracking-wide cursor-pointer">Log out</button>
                       </div>
                     </div>

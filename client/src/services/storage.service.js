@@ -1,6 +1,5 @@
 function StorageService() {
     this.setData = (key, value) => {
-        console.log(key);
         localStorage.setItem(key, JSON.stringify(value));
     }
 

@@ -1,3 +1,4 @@
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import UserPanelPage from './pages/userPanel/userPanel.page';
@@ -20,11 +21,6 @@ function App() {
         </Route>
       </Routes>
     </Router>
-
-
-
-
-
   );
 
 

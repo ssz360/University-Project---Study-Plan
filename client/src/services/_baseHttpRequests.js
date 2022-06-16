@@ -1,12 +1,17 @@
+import StorageService from "./storage.service";
+
 function HttpService() {
 
-    this.post = async (url = '', data = {}) => {
+    this.post = async (url = '', data = {}, hasCredentials = false) => {
         const response = await fetch(url, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
+        if (response.status === 401 && hasCredentials) {
+            goToLogIn();
+        }
         return response;
     }
 
@@ -17,6 +22,9 @@ function HttpService() {
             cache: 'no-cache',
             credentials: hasCredentials ? 'include' : undefined,
         });
+        if (response.status === 401) {
+            goToLogIn();
+        }
         return response;
     }
     this.delete = async (url = '', hasCredentials = false) => {
@@ -26,6 +34,10 @@ function HttpService() {
             cache: 'no-cache',
             credentials: hasCredentials ? 'include' : undefined,
         });
+
+        if (response.status === 401) {
+            goToLogIn();
+        }
         return response;
     }
 
@@ -36,7 +48,16 @@ function HttpService() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
+        if (response.status === 401) {
+            goToLogIn();
+        }
         return response;
+    }
+
+
+    function goToLogIn() {
+        document.location.pathname = '/login';
+        new StorageService().deleteData('user');
     }
 }
 

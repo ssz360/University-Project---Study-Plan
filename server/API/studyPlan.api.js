@@ -65,7 +65,7 @@ function studyPlanApi(app, authSrv) {
                 const courses = req.body;
 
                 if (studyPlan.id != planId) {
-                    req.status(401).json({ hasError: true, message: 'bad request' });
+                    req.status(400).json({ hasError: true, message: 'bad request' });
                     return;
                 }
 

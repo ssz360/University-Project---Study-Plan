@@ -13,7 +13,6 @@ import UserService from '../../services/user.services';
 import { useNavigate } from "react-router-dom";
 import StudyPlanService from '../../services/sutyPlan.service';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import CourseService from '../../services/course.service';
 
 
@@ -24,8 +23,8 @@ let globalCourses = [];
 function UserPanelPage() {
 
   const [isStudyPlanCreated, setIsStudyPlanCreated] = useState(false);
-  const [isStudyPlanDownloaded, setIsStudyPlanDownloaded] = useState(true);
-  const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(true);
+  const [isStudyPlanDownloaded, setIsStudyPlanDownloaded] = useState(false);
+  const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(false);
   const [editModeStudyplanCourses, setEditModeStudyPlanCourses] = useState([]);
   const [onEditMode, setOnEditMode] = useState(false);
   const [isDragged, setIsDragged] = useState(false);
@@ -48,8 +47,10 @@ function UserPanelPage() {
       if (x) {
         setAllCourses(x);
         globalCourses = x;
+        setIsCoursesDownloaded(true);
         getStudyPlan().then((studyPlan) => {
           upDateCourseList(studyPlan.courses, studyPlan);
+          setIsStudyPlanDownloaded(true);
         });
       }
     })
@@ -103,7 +104,9 @@ function UserPanelPage() {
   };
 
   async function getStudyPlan() {
+    setIsStudyPlanDownloaded(false);
     const studyPlan = await studyPlanSrv.getStudyPlan()
+    setIsStudyPlanDownloaded(true);
 
     if (studyPlan) {
       setIsStudyPlanCreated(true);
@@ -119,17 +122,17 @@ function UserPanelPage() {
   }
 
   const onCreateStudyPlanHandler = async (type) => {
-
+    setIsStudyPlanDownloaded(false);
     const result = await studyPlanSrv.addNewPlan(type);
+    setIsStudyPlanDownloaded(true);
+
     if (!result.hasError) {
-      console.log(result);
       setStudyPlan(result);
       onEditHandler(true);
       setIsStudyPlanCreated(true);
 
     } else {
-      console.log(result);
-      //******************************show error message  */
+      toast.error(`Incorrect data inserted.`);
     }
   }
 
@@ -169,20 +172,22 @@ function UserPanelPage() {
   async function onStudySave() {
 
     if (studyPlan?.id) {
-
-
+      
       const credits = editModeStudyplanCourses.reduce((sum, course) => sum + course.credit, 0);
       if (credits >= studyPlan.minCredits && credits <= studyPlan.maxCredits) {
+        setIsStudyPlanDownloaded(false);
         studyPlanCourses = [...editModeStudyplanCourses];
 
         const coursesId = editModeStudyplanCourses.map(x => x.id);
         await studyPlanSrv.editPlanCourses(studyPlan.id, coursesId);
         await getStudyPlan();
+        setIsStudyPlanDownloaded(true);
 
         courseSrv.getAll().then(x => {
           if (x) {
             setAllCourses(x);
             globalCourses = x;
+            upDateCourseList(studyPlanCourses, studyPlan);
           }
         })
 
@@ -216,24 +221,35 @@ function UserPanelPage() {
     }
 
     const enrolledCredits = newStudyCourses.reduce((sum, course) => sum += course.credit, 0);
-    for (let c1 of globalCourses) {
-      let course = newStudyCourses.find(c2 => c2.code === c1.code);
+
+    for (let globalCourse of globalCourses) {
+
+      let course = newStudyCourses.find(c2 => c2.code === globalCourse.code);
       if (course) {
-        c1.error.hasError = true;
-        c1.error.messages.push('The course is added already.');
+        globalCourse.error.hasError = true;
+        globalCourse.error.messages.push('The course is added already.');
       }
 
-      course = newStudyCourses.find(c2 => !!c2.incompatibleCoursesId.find((incomp) => incomp === c1.code));
+      course = newStudyCourses.find(newCourse => !!newCourse.incompatibleCoursesId.find((incomp) => incomp === globalCourse.code));
       if (course) {
-        c1.error.hasError = true;
-        c1.error.messages.push(`The Course ${course.code} is incompatible with this course.`);
+        globalCourse.error.hasError = true;
+        globalCourse.error.messages.push(`The Course ${course.code} is incompatible with this course.`);
       }
 
-      const newCreditIfAdded = enrolledCredits + c1.credit;
+      const newCreditIfAdded = enrolledCredits + globalCourse.credit;
       if (newCreditIfAdded > plan.maxCredits) {
-        c1.error.hasError = true;
-        c1.error.messages.push(`By adding this course the enrolled credits would exceed the maximum.`);
+        globalCourse.error.hasError = true;
+        globalCourse.error.messages.push(`By adding this course the enrolled credits would exceed the maximum.`);
       }
+
+      const preparatoryCourses = newStudyCourses.filter(x => globalCourse.preparatoryCoursesId.includes(x.code));
+      if (preparatoryCourses.length != globalCourse.preparatoryCoursesId.length) {
+        globalCourse.error.hasError = true;
+        globalCourse.error.messages.push(`All of the preparatories (${globalCourse.preparatoryCoursesId.join(',')}) must be added first`);
+      }
+
+
+
     }
 
     setAllCourses([...globalCourses]);
@@ -241,6 +257,14 @@ function UserPanelPage() {
 
 
   const onCourseDeleteHandler = (element) => {
+
+    for (let course of editModeStudyplanCourses) {
+      if (course.code != element.code && course.preparatoryCoursesId.find(x => element.code)) {
+        toast.error(`The dependent courses (${course.code}) must be deleted first.`);
+        return;
+      }
+    }
+
     let newStudyCourses = editModeStudyplanCourses.filter(el => el !== element);
     setEditModeStudyPlanCourses(newStudyCourses);
     upDateCourseList(newStudyCourses);

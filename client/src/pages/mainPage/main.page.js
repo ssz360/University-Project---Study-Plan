@@ -15,7 +15,7 @@ import CourseService from '../../services/course.service';
 function MainPage() {
 
   const [allCourses, setAllCourses] = useState([]);
-  const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(true);
+  const [isCoursesDownloaded, setIsCoursesDownloaded] = useState(false);
   const [selectedCourse, setSelectedCrouse] = useState();
 
   const courseSrv = new CourseService();
@@ -32,9 +32,10 @@ function MainPage() {
   useEffect(() => {
 
     courseSrv.getAll().then(x => {
-      if(x){
+      if (x) {
         setAllCourses(x);
         onAccordionClickHandler(x[0]);
+        setIsCoursesDownloaded(true);
       }
     })
 

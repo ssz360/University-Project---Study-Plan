@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
-const  userDAL  = require("../DAL/user.dal");
+const userDAL = require("../DAL/user.dal");
 
 function PassportService() {
     const dal = new userDAL();
@@ -51,7 +51,7 @@ function PassportService() {
 
     }
 
-    this.authenticate = (req,res,next) => {
+    this.authenticate = (req, res, next) => {
         return passport.authenticate('local', (err, user, info) => {
             if (err)
                 return next(err);
@@ -63,14 +63,15 @@ function PassportService() {
                     return next(err);
                 return res.status(201).json(req.user);
             });
-        })(req,res,next);
+        })(req, res, next);
     }
 
     this.isLoggedIn = (req, res, next) => {
         if (req.isAuthenticated()) {
             return next();
+        } else {
+            return res.status(401).json({ error: 'Not authorized' });
         }
-        return res.status(401).json({ error: 'Not authorized' });
     }
 
 }

@@ -1,6 +1,6 @@
 const { apiResponseModel } = require("../Models/apiResponse.model");
 const { studyPlanDefaults } = require('../Services/globalVariebles');
-const { checkIfCourseAdded, checkCourseIncompatibility, checkIfMaximumCreditsExceeds, checkIfPreparatoriesAreAddedAlready, checkIfMaximumStudentsEnrolled } = require("../Services/validations.service");
+const { checkCourseIncompatibility, checkIfMaximumCreditsExceeds, checkIfPreparatoriesAreAddedAlready, checkIfMaximumStudentsEnrolled, checkIfMinimumCreditsSatisfied } = require("../Services/validations.service");
 
 function studyPlanBAL(studyPlanDAL, scrDal, courseDal) {
 
@@ -62,11 +62,16 @@ function studyPlanBAL(studyPlanDAL, scrDal, courseDal) {
 
             }
 
-
             let validationResult = checkIfMaximumCreditsExceeds(newCourseList, studyPlan.maxCredits);
             if (validationResult && validationResult.hasError) {
                 error.hasError = true;
-                error.messages.push({ courseCode: globalCourse.code, message: validationResult.message });
+                error.messages.push({ message: validationResult.message });
+            }
+
+            validationResult = checkIfMinimumCreditsSatisfied(newCourseList, studyPlan.minCredits);
+            if (validationResult && validationResult.hasError) {
+                error.hasError = true;
+                error.messages.push({ message: validationResult.message });
             }
 
             for (let newCourse of newCourseList) {

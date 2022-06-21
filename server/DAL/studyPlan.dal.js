@@ -50,6 +50,8 @@ function studyPlanDAL() {
                         }
                         resolve(sp);
                     })
+                } else {
+                    resolve();
                 }
             } catch (error) {
                 reject(error);

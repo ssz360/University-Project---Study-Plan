@@ -37,8 +37,8 @@ function LoginPage() {
   }
 
   useEffect(() => {
-    setPassword('testpassword');
-    setUsername('user@gmail.com');
+    // setPassword('testpassword');
+    // setUsername('user1@gmail.com');
   })
 
   return (

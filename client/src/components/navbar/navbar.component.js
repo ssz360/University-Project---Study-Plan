@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.services";
+import './navbar.style.css';
 
 const userSrv = new UserService();
 function Navbar() {
@@ -9,7 +10,8 @@ function Navbar() {
   function onLogout() {
     const result = userSrv.logout();
     if (result) {
-      navigation('/');
+      document.location.pathname='/';
+      // navigation('/');
     }
   }
 
@@ -26,8 +28,8 @@ function Navbar() {
             <Link to={userSrv.isUserLoggedIn() ? '/user-panel' : '/'}>
               <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex-shrink-0 flex items-center">
-                  <img className="block lg:hidden h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow" />
-                  <img className="hidden lg:block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow" />
+                  <img className="block lg:hidden h-8 w-auto img-icon" src="images/logo.png" alt="Workflow" />
+                  <img className="hidden lg:block h-8 w-auto img-icon" src="images/logo.png" alt="Workflow" />
                 </div>
               </div>
             </Link>

@@ -51,7 +51,9 @@ function UserPanelPage() {
         globalCourses = x;
         setIsCoursesDownloaded(true);
         getStudyPlan().then((studyPlan) => {
-          validateAndUpDateCourseList(studyPlan.courses, studyPlan);
+          if(studyPlan){
+            validateAndUpDateCourseList(studyPlan.courses, studyPlan);
+          }
           setIsStudyPlanDownloaded(true);
         });
       }
@@ -132,6 +134,7 @@ function UserPanelPage() {
       setStudyPlan(result);
       onEditHandler(true);
       setIsStudyPlanCreated(true);
+      validateAndUpDateCourseList(studyPlanCourses, result);
 
     } else {
       toast.error(`Incorrect data inserted.`);

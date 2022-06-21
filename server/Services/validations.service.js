@@ -29,6 +29,19 @@ function checkIfMaximumCreditsExceeds(allNewStudyPlanCourses, maxCredit) {
     return false;
 }
 
+function checkIfMinimumCreditsSatisfied(allNewStudyPlanCourses, minCredit) {
+
+    const enrolledCredits = allNewStudyPlanCourses.reduce((sum, course) => sum += course.credit, 0);
+
+    if (enrolledCredits < minCredit) {
+        return {
+            hasError: true,
+            message: `The total credits are less than minimum credits of study plan.`
+        }
+    }
+    return false;
+}
+
 function checkIfPreparatoriesAreAddedAlready(courseToBeCheckWith, allNewStudyPlanCourses) {
 
     const preparatoryCourses = allNewStudyPlanCourses.filter(x => courseToBeCheckWith.preparatoryCoursesId.includes(x.code));
@@ -44,7 +57,7 @@ function checkIfPreparatoriesAreAddedAlready(courseToBeCheckWith, allNewStudyPla
 
 function checkIfMaximumStudentsEnrolled(courseToBeCheckWith) {
     if (courseToBeCheckWith.maxStudents === -1) return false;
-    if (courseToBeCheckWith.enrolled >= courseToBeCheckWith.maxStudents) {
+    if (courseToBeCheckWith.enrolled > courseToBeCheckWith.maxStudents) {
         return {
             hasError: true,
             message: `No empty seats are available, maximum number of students are enrolled to this course.`
@@ -54,4 +67,4 @@ function checkIfMaximumStudentsEnrolled(courseToBeCheckWith) {
     }
 }
 
-module.exports = { checkEmail, checkCourseIncompatibility, checkIfMaximumCreditsExceeds, checkIfPreparatoriesAreAddedAlready, checkIfMaximumStudentsEnrolled }
+module.exports = { checkEmail, checkCourseIncompatibility, checkIfMaximumCreditsExceeds, checkIfPreparatoriesAreAddedAlready, checkIfMaximumStudentsEnrolled, checkIfMinimumCreditsSatisfied }

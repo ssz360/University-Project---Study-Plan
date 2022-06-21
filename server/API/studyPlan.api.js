@@ -1,4 +1,5 @@
 const studyPlanBAL = require("../BAL/studyPlan.bal");
+const courseDAL = require("../DAL/course.dal");
 const studyCourseRelationDAL = require("../DAL/studyCourseRelation.dal");
 const studyPlanDAL = require("../DAL/studyPlan.dal");
 
@@ -6,7 +7,8 @@ const studyPlanDAL = require("../DAL/studyPlan.dal");
 function studyPlanApi(app, authSrv) {
     const dal = new studyPlanDAL();
     const scrDal = new studyCourseRelationDAL();
-    const bal = new studyPlanBAL(dal);
+    const courseDal = new courseDAL();
+    const bal = new studyPlanBAL(dal, scrDal, courseDal);
     this.init = async () => {
         await dal._crateTable();
         await scrDal._crateTable();
@@ -44,41 +46,29 @@ function studyPlanApi(app, authSrv) {
 
     this.DeleteUserStudyPlan = () => {
         app.delete('/api/studyplan', authSrv.isLoggedIn, async (req, res, next) => {
-           
-            const studyPlan = await dal.getOne(req.user.id);
-            await scrDal.delete(studyPlan.id);
 
             bal.DeleteStudyPlane(req.user.id).then((result) => {
                 res.status(result.httpCode).json(result.response);
             })
                 .catch((err) => {
                     res.status(500).json(err);
-                });;
+                });
         });
     }
 
     this.editPlansCourse = () => {
         app.put('/api/studyplan/:planId/courses', authSrv.isLoggedIn, async (req, res, next) => {
-            try {
-                const studyPlan = await dal.getOne(req.user.id);
-                const planId = req.params.planId;
-                const courses = req.body;
 
-                if (studyPlan.id != planId) {
-                    req.status(400).json({ hasError: true, message: 'bad request' });
-                    return;
-                }
 
-                await scrDal.delete(studyPlan.id);
+            const planId = req.params.planId;
+            const courses = req.body;
 
-                for (let courseId of courses) {
-                    await scrDal.add(studyPlan.id, courseId);
-                }
-                res.status(200).json();
-
-            } catch (error) {
-                res.status(500).json(err);
-            }
+            bal.EditPlanCourses(req.user.id, courses, planId).then((result) => {
+                res.status(result.httpCode).json(result.response);
+            })
+                .catch((err) => {
+                    res.status(500).json(err);
+                });
         });
     }
 }

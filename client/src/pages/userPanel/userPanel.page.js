@@ -249,7 +249,7 @@ function UserPanelPage() {
         globalCourse.error.messages.push(validationResult.message);
       }
 
-      validationResult = checkIfMaximumStudentsEnrolled(globalCourse,);
+      validationResult = checkIfMaximumStudentsEnrolled(globalCourse);
       if (validationResult && validationResult.hasError) {
         globalCourse.error.hasError = true;
         globalCourse.error.messages.push(validationResult.message);
@@ -266,7 +266,7 @@ function UserPanelPage() {
   const onCourseDeleteHandler = (element) => {
 
     for (let course of editModeStudyplanCourses) {
-      if (course.code != element.code && course.preparatoryCoursesId.find(x => element.code)) {
+      if (course.code !== element.code && course.preparatoryCoursesId.find(x => element.code)) {
         toast.error(`The dependent courses (${course.code}) must be deleted first.`);
         return;
       }

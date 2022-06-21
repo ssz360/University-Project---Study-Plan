@@ -46,7 +46,7 @@ function checkIfPreparatoriesAreAddedAlready(courseToBeCheckWith, allNewStudyPla
 
     const preparatoryCourses = allNewStudyPlanCourses.filter(x => courseToBeCheckWith.preparatoryCoursesId.includes(x.code));
 
-    if (preparatoryCourses.length != courseToBeCheckWith.preparatoryCoursesId.length) {
+    if (preparatoryCourses.length !== courseToBeCheckWith.preparatoryCoursesId.length) {
         return {
             hasError: true,
             message: `All of the preparatories (${courseToBeCheckWith.preparatoryCoursesId.join(',')}) must be added first`

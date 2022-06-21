@@ -7,8 +7,8 @@ const studyPlanDefaults = {
     },
     fullTime: {
         type: 'Full time',
-        maxCredits: 60,
-        minCredits: 40,
+        maxCredits: 80,
+        minCredits: 60,
         addedCourses: undefined
     }
 }

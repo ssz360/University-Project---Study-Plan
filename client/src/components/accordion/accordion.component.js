@@ -42,6 +42,8 @@ function Accordion(props) {
                         <span>&nbsp;{course.code}&nbsp; | &nbsp;</span>
                         <span>max enrolled:</span>
                         <span>&nbsp;{course.maxStudents >= 0 ? course.maxStudents : '--'}&nbsp; | &nbsp;</span>
+                        <span>enrolled:</span>
+                        <span>&nbsp;{course.enrolled >= 0 ? course.enrolled : '--'}&nbsp; | &nbsp;</span>
                         <span>credit:</span>
                         <span>&nbsp;{course.credit}</span>
                     </div>

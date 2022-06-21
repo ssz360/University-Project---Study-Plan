@@ -1,4 +1,5 @@
-const  userDAL  = require("../DAL/user.dal");
+const userDAL = require("../DAL/user.dal");
+const { checkEmail } = require("../Services/validations.service");
 
 
 function userApi(app, authSrv) {
@@ -12,6 +13,12 @@ function userApi(app, authSrv) {
 
     this.login = () => {
         app.post('/api/login', function (req, res, next) {
+            const { email, password } = req.body;
+            let validation = checkEmail(email);
+            if (validation) {
+                res.status(400);
+            }
+
             authSrv.authenticate(req, res, next);
         });
     }
@@ -25,4 +32,4 @@ function userApi(app, authSrv) {
     }
 }
 
-module.exports =  userApi ;
+module.exports = userApi;

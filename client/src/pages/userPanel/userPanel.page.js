@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import StudyPlanService from '../../services/sutyPlan.service';
 import { ToastContainer, toast } from 'react-toastify';
 import CourseService from '../../services/course.service';
+import { checkCourseIncompatibility, checkIfCourseAdded, checkIfMaximumCreditsExceeds, checkIfMaximumStudentsEnrolled, checkIfPreparatoriesAreAddedAlready } from '../../services/valisdations.service';
 
 
 let ifOnEditSet = false;
@@ -45,11 +46,12 @@ function UserPanelPage() {
 
     courseSrv.getAll().then(x => {
       if (x) {
+        x.sort((a, b) => a.name.localeCompare(b.name));
         setAllCourses(x);
         globalCourses = x;
         setIsCoursesDownloaded(true);
         getStudyPlan().then((studyPlan) => {
-          upDateCourseList(studyPlan.courses, studyPlan);
+          validateAndUpDateCourseList(studyPlan.courses, studyPlan);
           setIsStudyPlanDownloaded(true);
         });
       }
@@ -68,7 +70,7 @@ function UserPanelPage() {
         },
         moves: function (el, source, handle, sibling) {
           const courseId = el.getAttribute('data-courseid');
-          const course = globalCourses.find(x => x.code == courseId);
+          const course = globalCourses.find(x => x.code === courseId);
 
           if (!ifOnEditSet) return false;
           if (source.id !== 'courses-list')
@@ -114,7 +116,7 @@ function UserPanelPage() {
       studyPlanCourses = studyPlan.courses ? studyPlan.courses : [];
       setEditModeStudyPlanCourses(studyPlanCourses);
 
-      if (studyPlanCourses?.length == 0) {
+      if (studyPlanCourses?.length === 0) {
         onEditHandler('edit');
       }
     }
@@ -160,7 +162,7 @@ function UserPanelPage() {
         break;
       case 'cancel':
         setEditModeStudyPlanCourses(studyPlanCourses ? [...studyPlanCourses] : []);
-        upDateCourseList(studyPlanCourses ? [...studyPlanCourses] : []);
+        validateAndUpDateCourseList(studyPlanCourses ? [...studyPlanCourses] : []);
         ifOnEditSet = false;
         setOnEditMode(ifOnEditSet);
         break;
@@ -172,7 +174,7 @@ function UserPanelPage() {
   async function onStudySave() {
 
     if (studyPlan?.id) {
-      
+
       const credits = editModeStudyplanCourses.reduce((sum, course) => sum + course.credit, 0);
       if (credits >= studyPlan.minCredits && credits <= studyPlan.maxCredits) {
         setIsStudyPlanDownloaded(false);
@@ -187,7 +189,7 @@ function UserPanelPage() {
           if (x) {
             setAllCourses(x);
             globalCourses = x;
-            upDateCourseList(studyPlanCourses, studyPlan);
+            validateAndUpDateCourseList(studyPlanCourses, studyPlan);
           }
         })
 
@@ -204,13 +206,13 @@ function UserPanelPage() {
   function onDropAndAddToStudyPlan(el) {
 
     const courseId = el.getAttribute('data-courseid');
-    const course = globalCourses.find(x => x.code == courseId);
+    const course = globalCourses.find(x => x.code === courseId);
     let newStudyCourses = [...editModeStudyplanCourses, course];
     setEditModeStudyPlanCourses(newStudyCourses);
-    upDateCourseList(newStudyCourses);
+    validateAndUpDateCourseList(newStudyCourses);
   }
 
-  function upDateCourseList(newStudyCourses, plan) {
+  function validateAndUpDateCourseList(newStudyCourses, plan) {
     plan = plan ? plan : studyPlan;
     for (let c1 of globalCourses) {
       c1.error = {
@@ -220,32 +222,37 @@ function UserPanelPage() {
       }
     }
 
-    const enrolledCredits = newStudyCourses.reduce((sum, course) => sum += course.credit, 0);
 
     for (let globalCourse of globalCourses) {
 
-      let course = newStudyCourses.find(c2 => c2.code === globalCourse.code);
-      if (course) {
+      let validationResult = checkIfCourseAdded(globalCourse, newStudyCourses);
+      if (validationResult && validationResult.hasError) {
         globalCourse.error.hasError = true;
-        globalCourse.error.messages.push('The course is added already.');
+        globalCourse.error.messages.push(validationResult.message);
       }
 
-      course = newStudyCourses.find(newCourse => !!newCourse.incompatibleCoursesId.find((incomp) => incomp === globalCourse.code));
-      if (course) {
+      validationResult = checkCourseIncompatibility(globalCourse, newStudyCourses);
+      if (validationResult && validationResult.hasError) {
         globalCourse.error.hasError = true;
-        globalCourse.error.messages.push(`The Course ${course.code} is incompatible with this course.`);
+        globalCourse.error.messages.push(validationResult.message);
       }
 
-      const newCreditIfAdded = enrolledCredits + globalCourse.credit;
-      if (newCreditIfAdded > plan.maxCredits) {
+      validationResult = checkIfMaximumCreditsExceeds(globalCourse, newStudyCourses, plan.maxCredits);
+      if (validationResult && validationResult.hasError) {
         globalCourse.error.hasError = true;
-        globalCourse.error.messages.push(`By adding this course the enrolled credits would exceed the maximum.`);
+        globalCourse.error.messages.push(validationResult.message);
       }
 
-      const preparatoryCourses = newStudyCourses.filter(x => globalCourse.preparatoryCoursesId.includes(x.code));
-      if (preparatoryCourses.length != globalCourse.preparatoryCoursesId.length) {
+      validationResult = checkIfPreparatoriesAreAddedAlready(globalCourse, newStudyCourses);
+      if (validationResult && validationResult.hasError) {
         globalCourse.error.hasError = true;
-        globalCourse.error.messages.push(`All of the preparatories (${globalCourse.preparatoryCoursesId.join(',')}) must be added first`);
+        globalCourse.error.messages.push(validationResult.message);
+      }
+
+      validationResult = checkIfMaximumStudentsEnrolled(globalCourse,);
+      if (validationResult && validationResult.hasError) {
+        globalCourse.error.hasError = true;
+        globalCourse.error.messages.push(validationResult.message);
       }
 
 
@@ -267,7 +274,7 @@ function UserPanelPage() {
 
     let newStudyCourses = editModeStudyplanCourses.filter(el => el !== element);
     setEditModeStudyPlanCourses(newStudyCourses);
-    upDateCourseList(newStudyCourses);
+    validateAndUpDateCourseList(newStudyCourses);
   }
 
   const onStudyPlanDeleteHandler = async () => {
@@ -277,7 +284,7 @@ function UserPanelPage() {
     studyPlanCourses = [];
     setEditModeStudyPlanCourses([]);
 
-    upDateCourseList([]);
+    validateAndUpDateCourseList([]);
     onEditHandler(false);
   }
 
@@ -320,8 +327,8 @@ function UserPanelPage() {
                     <div className="table-bottom">
                       <span>Study plan type:&nbsp;</span>
                       <span>{studyPlan.type}</span>
-                      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maximum credit:&nbsp;</span>
-                      <span>{studyPlan.maxCredits}</span>
+                      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Minimum / Maximum credit:&nbsp;</span>
+                      <span>{studyPlan.minCredits}/{studyPlan.maxCredits}</span>
                       <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enrolled credit:&nbsp;</span>
                       <span>{editModeStudyplanCourses.reduce((sum, course) => sum += course.credit, 0)}</span>
                     </div>

@@ -51,7 +51,9 @@ function LoginPage() {
           </Link>
           <div className="login-html">
             <input id="tab-1" type="radio" name="tab" className="sign-in" checked onChange={() => { }} /><label htmlFor="tab-1" className="tab cursor-pointer">Sign In</label>
-            <input id="tab-2" type="radio" name="tab" className="sign-up" /><label htmlFor="tab-2" className="tab cursor-pointer">Sign Up</label>
+            <input id="tab-2" type="radio" name="tab" className="sign-up" /><label htmlFor="tab-2" className="tab cursor-pointer">
+              {/* <span>Sign Up</span> */}
+            </label>
             <div className="login-form">
               <div className="sign-in-htm">
                 <div className="group">

@@ -33,7 +33,7 @@ function MainPage() {
 
     courseSrv.getAll().then(x => {
       if (x) {
-        setAllCourses(x);
+        setAllCourses(x.sort((a, b) => a.name.localeCompare(b.name)));
         onAccordionClickHandler(x[0]);
         setIsCoursesDownloaded(true);
       }

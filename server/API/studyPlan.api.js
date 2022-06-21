@@ -21,7 +21,7 @@ function studyPlanApi(app, authSrv) {
     this.AddNewPlan = () => {
         app.post('/api/studyplan', authSrv.isLoggedIn, async (req, res, next) => {
 
-            bal.addStudyPlan(req.body.type, req.session.passport.user.id).then((result) => {
+            bal.addStudyPlan(req.body.type, req.user.id).then((result) => {
                 res.status(result.httpCode).json(result.response);
             })
                 .catch((err) => {
@@ -33,7 +33,7 @@ function studyPlanApi(app, authSrv) {
 
     this.getUserStudyPlan = () => {
         app.get('/api/studyplan', authSrv.isLoggedIn, async (req, res, next) => {
-            bal.getUserStudyPlan(req.session.passport.user.id).then((result) => {
+            bal.getUserStudyPlan(req.user.id).then((result) => {
                 res.status(result.httpCode).json(result.response);
             })
                 .catch((err) => {
@@ -45,10 +45,10 @@ function studyPlanApi(app, authSrv) {
     this.DeleteUserStudyPlan = () => {
         app.delete('/api/studyplan', authSrv.isLoggedIn, async (req, res, next) => {
            
-            const studyPlan = await dal.getOne(req.session.passport.user.id);
+            const studyPlan = await dal.getOne(req.user.id);
             await scrDal.delete(studyPlan.id);
 
-            bal.DeleteStudyPlane(req.session.passport.user.id).then((result) => {
+            bal.DeleteStudyPlane(req.user.id).then((result) => {
                 res.status(result.httpCode).json(result.response);
             })
                 .catch((err) => {
@@ -60,7 +60,7 @@ function studyPlanApi(app, authSrv) {
     this.editPlansCourse = () => {
         app.put('/api/studyplan/:planId/courses', authSrv.isLoggedIn, async (req, res, next) => {
             try {
-                const studyPlan = await dal.getOne(req.session.passport.user.id);
+                const studyPlan = await dal.getOne(req.user.id);
                 const planId = req.params.planId;
                 const courses = req.body;
 

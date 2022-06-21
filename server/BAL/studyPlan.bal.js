@@ -15,6 +15,10 @@ function studyPlanBAL(studyPlanDAL) {
 
         try {
             const studyPlan = studyPlanDefaults[type];
+            if (!studyPlan) {
+                return new apiResponseModel(400, 'bad request');
+            }
+            
             const result = await studyPlanDAL.add(studyPlan, userId);
             if (result > 0) {
                 studyPlan.id = result;

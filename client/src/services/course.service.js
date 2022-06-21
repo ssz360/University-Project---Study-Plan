@@ -9,7 +9,7 @@ function CourseService() {
         return new Promise(async (resolve, reject) => {
 
             const result = await http.get(baseUrl + 'api/courses',true);
-            if (result.status == 200) {
+            if (result.status === 200) {
                 const data = result.json();
                 resolve(data);
             }

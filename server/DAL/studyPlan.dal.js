@@ -43,7 +43,7 @@ function studyPlanDAL() {
                     dbm.db.all(sql, [sp.id], (err, data) => {
                         if (err) reject(err);
                         for (let el of data) {
-                            let course = courses.response.find(x => x.code == el.code);
+                            let course = courses.response.find(x => x.code === el.code);
                             if (course) {
                                 sp.courses.push(course);
                             }

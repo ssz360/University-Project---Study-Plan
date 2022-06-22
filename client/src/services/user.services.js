@@ -22,6 +22,18 @@ function UserService() {
         });
     }
 
+    this.register = (username, password, name, surname) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const result = await http.post(baseUrl + 'api/register', { email: username, password, name, surname });
+                resolve(result.json());
+            } catch (error) {
+
+                resolve(false);
+            }
+
+        });
+    }
 
     this.logout = () => {
         return new Promise(async (resolve, reject) => {

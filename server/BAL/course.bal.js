@@ -5,7 +5,6 @@ function courseBAL(dal) {
         try {
             return new apiResponseModel(await dal.getAll());
         } catch (error) {
-            console.log(error);
             return new apiResponseModel("Internal Server Error", 500);
         }
     };

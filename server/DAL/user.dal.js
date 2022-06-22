@@ -41,6 +41,7 @@ function userDAL() {
             email: 'user1@gmail.com',
             name: 'john',
             surname: 'snow',
+            password: 'testpassword',
 
         };
 
@@ -48,39 +49,30 @@ function userDAL() {
             email: 'user2@gmail.com',
             name: 'jack',
             surname: 'snow',
+            password: 'testpassword',
 
         };
         const user3 = {
             email: 'user3@gmail.com',
             name: 'john',
             surname: 'smith',
+            password: 'testpassword',
 
         };
         const user4 = {
             email: 'user4@gmail.com',
             name: 'emily',
             surname: 'snow',
+            password: 'testpassword',
 
         };
         const user5 = {
             email: 'user5@gmail.com',
             name: 'jenifer',
             surname: 'snow',
+            password: 'testpassword',
 
         };
-        const pass = 'testpassword';
-        user1.salt = crypto.randomBytes(32).toString('hex');
-        user2.salt = crypto.randomBytes(32).toString('hex');
-        user3.salt = crypto.randomBytes(32).toString('hex');
-        user4.salt = crypto.randomBytes(32).toString('hex');
-        user5.salt = crypto.randomBytes(32).toString('hex');
-
-        user1.password = await getHashedPassword(pass, user1.salt);
-        user2.password = await getHashedPassword(pass, user2.salt);
-        user3.password = await getHashedPassword(pass, user3.salt);
-        user3.password = await getHashedPassword(pass, user3.salt);
-        user4.password = await getHashedPassword(pass, user4.salt);
-        user5.password = await getHashedPassword(pass, user5.salt);
 
         user1.id = await this.add(user1);
         user2.id = await this.add(user2);
@@ -121,7 +113,7 @@ function userDAL() {
         const challenge = allCourses.find(x => x.code === '03UEWOV').id;
         const internet = allCourses.find(x => x.code === '01URSPD').id;
         const model = allCourses.find(x => x.code === '01OUZPD').id;
-        const computational  = allCourses.find(x => x.code === '01URROV').id;
+        const computational = allCourses.find(x => x.code === '01URROV').id;
 
         user2Courses.push(tecnologie);
         user2Courses.push(wa1);
@@ -172,12 +164,15 @@ function userDAL() {
     this.add = async (user) => {
         let db = new DatabaseManagement();
 
+        const salt = crypto.randomBytes(32).toString('hex');
+        const hashedPassword = await getHashedPassword(user.password, salt);
+
         return await db.insertData(tableName, [
             new insertFields("email", user.email),
             new insertFields("name", user.name),
             new insertFields("surname", user.surname),
-            new insertFields("password", user.password),
-            new insertFields("salt", user.salt),
+            new insertFields("password", hashedPassword),
+            new insertFields("salt", salt),
         ]);
     };
 

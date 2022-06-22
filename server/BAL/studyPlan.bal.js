@@ -9,7 +9,6 @@ function studyPlanBAL(studyPlanDAL, scrDal, courseDal) {
         try {
             return new apiResponseModel(await studyPlanDAL.getOne(userId));
         } catch (error) {
-            console.log(error);
             return new apiResponseModel("Internal Server Error: " + error, 500);
         }
     };

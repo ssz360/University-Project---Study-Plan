@@ -4,8 +4,8 @@
 ## React Client Application Routes
 
 - Route `/`: The main page of the website which shows the list of all the courses and their information like course name and its code
-- Route `/login`: The login form is shown here and the user can login to they user-panel through this page by enterin their username and password
-- Route `/user-panel`:  User will be able to create they study plan and drag and drop they desired courses into the created study plan 
+- Route `/login`: The login form is shown here and the user can login to they user-panel through this page by entering their username and password
+- Route `/user-panel`:  User will be able to create their study plan and drag and drop their desired courses into the created study plan 
 
 ## API Server
 
@@ -14,6 +14,11 @@
     `{"email":"user1@gmail.com","password":"************"}`
   - response body content:
     `{"id":1,"name":"john","surname":"snow","email":"user1@gmail.com"}`
+- POST `/api/register`
+  - request body:
+    `{"email":"user10@gmail.com","password":"****","name":"John","surname":"Snow"}`
+  - response body content:
+    `{"result":true}`
 - POST `/api/logout`
   - No request body or response body
 - POST `/api/studyplan`
@@ -156,13 +161,13 @@
 
 ## Main React Components
 
-- `Accordion` (in `/components/accordion/accordion.component.js`): It shows the course info like foldable accordion
+- `Accordion` (in `/components/accordion/accordion.component.js`): It shows the course info like a foldable accordion
 - `AccordionList` (in `/components/accordionList/accordion.component.js`): Contains the list of accordions
 - `BlankStudyPlan` (in `/components/blankStudyPlan/blankStudyPlan.component.js`): It is shown when the studyplan is not created yet, it contains two buttons for creating 'full-time' or 'part-time' studyplans
-- `CourseDetails` (in `/components/corseDetails/corseDetails.component.js`): In the main page when the users are not logged in this component is shown which presents the information about the courses when they are selected
+- `CourseDetails` (in `/components/corseDetails/corseDetails.component.js`): On the main page when the users are not logged in this component is shown which presents the information about the courses when they are selected
 - `Loading` (in `/components/loading/loading.component.js`): This component is shown instead of the main components when the data isn't gotten from the server and they are not ready yet
 - `Navbar` (in `/components/navbar/navbar.component.js`): This is the navbar of the site
-- `StudyPlan` (in `/components/studyPlan/studyPlan.component.js`): When a user creates a studyplan this components is shown and user can do actions like add, remove, modify ... through the interaction with this one, this component is consist of these other components: `StudyPlanHeader, StudyPlanTable, StudyPlanTableElement`
+- `StudyPlan` (in `/components/studyPlan/studyPlan.component.js`): When a user creates a studyplan these components is shown and the user can do actions like add, remove, modify ... through the interaction with this one, this component is consist of these other components: `StudyPlanHeader, StudyPlanTable, StudyPlanTableElement`
 
 
 ## Paged
@@ -175,7 +180,9 @@
 
 ### Main page
 ![Screenshot](./images/main-page.jpg)
-### Login page
+### Login / Register page
+![Screenshot](./images/register.jpg)
+### Login / Register page
 ![Screenshot](./images/login-page.jpg)
 ### User-panel: When study plan isn't created
 ![Screenshot](./images/user-panel-plan-not-created.jpg)
@@ -188,8 +195,10 @@
 
 ## Users Credentials
 
-- user1@gmail.com, testpassword 
-- user2@gmail.com, testpassword 
-- user3@gmail.com, testpassword 
-- user4@gmail.com, testpassword 
-- user5@gmail.com, testpassword 
+|Username| Password|
+|--------|---------|
+|user1@gmail.com| testpassword| 
+|user2@gmail.com| testpassword|
+|user3@gmail.com| testpassword|
+|user4@gmail.com| testpassword|
+|user5@gmail.com| testpassword|

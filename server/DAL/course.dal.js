@@ -257,11 +257,4 @@ function courseDAL() {
 
 }
 
-// new creationTableFields("code", "text"),
-// new creationTableFields("name", "text"),
-// new creationTableFields("credit", "integer"),
-// new creationTableFields("incompatibleCoursesId", "text"),
-// new creationTableFields("preparatoryCoursesId", "text"),
-// new creationTableFields("maxStudents", "integer"),
-
 module.exports = courseDAL;

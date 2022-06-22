@@ -9,6 +9,7 @@ function userApi(app, authSrv) {
 
         this.login();
         this.logout();
+        this.register();
     };
 
     this.login = () => {
@@ -20,6 +21,39 @@ function userApi(app, authSrv) {
             }
 
             authSrv.authenticate(req, res, next);
+        });
+    }
+
+    this.register = () => {
+        app.post('/api/register', async function (req, res, next) {
+            const { email, password, name, surname } = req.body;
+            let validation = checkEmail(email);
+            if (validation) {
+                res.status(400);
+            }
+
+            const user = {
+                email: email,
+                name: name,
+                surname: surname,
+                password: password
+            };
+
+            try {
+                const checkUser = await dal.getUser(email);
+                if (checkUser) {
+                    res.status(400).json({ result: false, message: 'This Email is registered already.' });
+                    return;
+                }
+                const result = await dal.add(user);
+                if (result) {
+                    res.status(201).json({ result: true });
+                    return;
+                }
+            } catch (error) {
+                res.status(400).json({ result: false, message: error });
+                return;
+            }
         });
     }
 

@@ -51,7 +51,7 @@ function UserPanelPage() {
         globalCourses = x;
         setIsCoursesDownloaded(true);
         getStudyPlan().then((studyPlan) => {
-          if(studyPlan){
+          if (studyPlan) {
             validateAndUpDateCourseList(studyPlan.courses, studyPlan);
           }
           setIsStudyPlanDownloaded(true);
@@ -210,6 +210,7 @@ function UserPanelPage() {
 
     const courseId = el.getAttribute('data-courseid');
     const course = globalCourses.find(x => x.code === courseId);
+    course.enrolled++;
     let newStudyCourses = [...editModeStudyplanCourses, course];
     setEditModeStudyPlanCourses(newStudyCourses);
     validateAndUpDateCourseList(newStudyCourses);
@@ -269,11 +270,16 @@ function UserPanelPage() {
   const onCourseDeleteHandler = (element) => {
 
     for (let course of editModeStudyplanCourses) {
-      if (course.code !== element.code && course.preparatoryCoursesId.find(x => element.code)) {
+      if (course.code !== element.code && course.preparatoryCoursesId.find(x => x === element.code)) {
         toast.error(`The dependent courses (${course.code}) must be deleted first.`);
         return;
       }
     }
+
+
+    const deletedCourse = allCourses.find(x => x.code === element.code);
+    deletedCourse.enrolled--;
+    setAllCourses([...allCourses])
 
     let newStudyCourses = editModeStudyplanCourses.filter(el => el !== element);
     setEditModeStudyPlanCourses(newStudyCourses);

@@ -1,0 +1,59 @@
+.gu-mirror {
+  position: fixed !important;
+  margin: 0 !important;
+  z-index: 9999 !important;
+  opacity: 0.8;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80);
+}
+.gu-hide {
+  display: none !important;
+}
+.gu-unselectable {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+.gu-transit {
+  opacity: 0.2;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+}
+
+.highlighted-border {
+  border-color: #b617d3;
+}
+
+.drag-drop-img {
+  height: 60px;
+  position: absolute;
+  top: -65px;
+  right: -70px;
+}
+
+.left-container{
+  
+  
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+     -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently
+                                supported by Chrome, Edge, Opera and Firefox */
+}
+
+.table-bottom {
+  bottom: -39px;
+  position: absolute;
+  border: 1px solid #e5e7eb;
+  height: 40px;
+  background: white;
+  left: 50%;
+  border-top: initial;
+  transform: translateX(-50%);
+  padding: 10px;
+  width: 550px;
+  font-size: 12px;
+}

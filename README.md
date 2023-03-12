@@ -1,5 +1,4 @@
 # Exam #1: "StudyPlan"
-## Student: S300099 Seyed Sajjad Zahedi Jahromi
 
 ## React Client Application Routes
 
